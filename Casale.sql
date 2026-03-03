@@ -103,6 +103,91 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 
+-- phpMyAdmin SQL Dump
+-- version 5.2.3
+-- https://www.phpmyadmin.net/
+--
+-- Host: localhost
+-- Generation Time: Mar 03, 2026 at 03:36 PM
+-- Server version: 8.0.45
+-- PHP Version: 8.2.30
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `lawfirm`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `appointment_times`
+--
+
+CREATE TABLE `appointment_times` (
+  `appt_time_id` int UNSIGNED NOT NULL,
+  `appointment_id` int UNSIGNED NOT NULL,
+  `start_time` datetime NOT NULL,
+  `end_time` datetime NOT NULL,
+  `timezone` varchar(60) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'America/New_York',
+  `type` enum('meeting','call','court','deadline','other') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'meeting'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `appointment_times`
+--
+
+INSERT INTO `appointment_times` (`appt_time_id`, `appointment_id`, `start_time`, `end_time`, `timezone`, `type`) VALUES
+(10, 10, '2026-02-26 06:22:00', '2026-02-26 08:22:00', 'America/New_York', 'meeting'),
+(11, 11, '2026-02-26 07:24:00', '2026-02-26 10:27:00', 'America/New_York', 'meeting'),
+(12, 12, '2026-02-26 03:35:00', '2026-02-26 03:36:00', 'America/New_York', 'meeting'),
+(13, 13, '2026-02-26 04:51:00', '2026-02-26 06:53:00', 'America/New_York', 'meeting');
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `appointment_times`
+--
+ALTER TABLE `appointment_times`
+  ADD PRIMARY KEY (`appt_time_id`),
+  ADD KEY `fk_time_appointment` (`appointment_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `appointment_times`
+--
+ALTER TABLE `appointment_times`
+  MODIFY `appt_time_id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `appointment_times`
+--
+ALTER TABLE `appointment_times`
+  ADD CONSTRAINT `fk_time_appointment` FOREIGN KEY (`appointment_id`) REFERENCES `appointments` (`appointment_id`) ON DELETE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
 
 
 
