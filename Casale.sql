@@ -26,7 +26,82 @@ CREATE TABLE CASES (
     CONSTRAINT Case_Status_Check CHECK 
         (status IN ("Open", "Closed", "Pending", "Appeal"))
 );
+-- phpMyAdmin SQL Dump
+-- version 5.2.3
+-- https://www.phpmyadmin.net/
+--
+-- Host: localhost
+-- Generation Time: Mar 03, 2026 at 03:31 PM
+-- Server version: 8.0.45
+-- PHP Version: 8.2.30
 
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `lawfirm`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `appointments`
+--
+
+CREATE TABLE `appointments` (
+  `appointment_id` int UNSIGNED NOT NULL,
+  `client_name` varchar(150) COLLATE utf8mb4_general_ci NOT NULL,
+  `client_email` varchar(190) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `attorney_name` varchar(150) COLLATE utf8mb4_general_ci NOT NULL,
+  `title` varchar(150) COLLATE utf8mb4_general_ci NOT NULL,
+  `description` text COLLATE utf8mb4_general_ci,
+  `location` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `status` enum('pending','scheduled','confirmed','completed','cancelled','no_show') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'pending',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `appointments`
+--
+
+INSERT INTO `appointments` (`appointment_id`, `client_name`, `client_email`, `attorney_name`, `title`, `description`, `location`, `status`, `created_at`, `updated_at`) VALUES
+(10, 'chiemela francis', 'chiemela039@gmail.com', 'Attorney', 'loitering', '', '', 'pending', '2026-02-26 08:24:24', '2026-02-26 08:24:24'),
+(11, 'chiemela francis', 'chiemela039@gmail.com', 'Attorney', 'bb', '', '', 'pending', '2026-02-26 08:25:01', '2026-02-26 08:25:01'),
+(12, 'chiemela francis', 'chiemela039@gmail.com', 'Attorney', 'ljl', '', '', 'confirmed', '2026-02-26 08:35:12', '2026-02-26 08:53:12'),
+(13, 'chiemela francis', 'chiemela039@gmail.com', 'Attorney', 'aa', '', '', 'confirmed', '2026-02-26 08:52:07', '2026-02-26 15:46:00');
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `appointments`
+--
+ALTER TABLE `appointments`
+  ADD PRIMARY KEY (`appointment_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `appointments`
+--
+ALTER TABLE `appointments`
+  MODIFY `appointment_id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 
 
 
