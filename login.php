@@ -1,52 +1,50 @@
 <?php
-require __DIR__ . "/config/db.php";
 session_start();
 
-$msg = "";
-
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $email = trim($_POST["email"]);
-    $password = $_POST["password"];
-
-    $stmt = $conn->prepare("SELECT user_id, full_name, email, password_hash, role FROM users WHERE email=?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $user = $result->fetch_assoc();
-
-    if ($user && password_verify($password, $user["password_hash"])) {
-        $_SESSION["user"] = $user;
-        header("Location: dashboard.php");
-        exit;
-    } else {
-        $msg = "Invalid login.";
-    }
-}
 ?>
 <!doctype html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Login</title>
-  <link rel="stylesheet" href="assets/style.css">
-</head>
+ <head>
+
+        <title>Charles Casale - Home</title>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+        
+        <script src="site.js" defer></script>
+        <link rel="stylesheet" href = "style.css">
+        <link rel="icon" type="image/x-icon" href="">
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" 
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" 
+        crossorigin="anonymous"></script>
+
+    </head>
 <body>
 
-<div class="card" style="max-width:400px;margin:80px auto;">
+<div class="form_container">
   <h2>Login</h2>
 
-  <?php if ($msg): ?>
-    <div class="msg"><?php echo htmlspecialchars($msg); ?></div>
-  <?php endif; ?>
+  <?php 
+    if (isset($_SESSION["login_error"]) && !empty($_SESSION["login_error"])) {
+      echo '<div class="alert alert-danger" role="alert">';
+      echo htmlspecialchars($_SESSION["login_error"]);
+      echo "</div>";
+      unset($_SESSION["login_error"]);
+    }
+  ?>
 
-  <form method="POST">
-    <label>Email</label>
-    <input name="email" required>
+  <form action="login_action.php" method="POST">
+    <label class="form-label">Email:</label>
+        <input type="email" class="form-control" name="email" required>  
 
-    <label>Password</label>
-    <input type="password" name="password" required>
+    <label class="form-label">Password</label>
+    <input type="password" name="password" class="form-control" required>
 
-    <button class="btn btn-dark" style="margin-top:14px;">Login</button>
+    <button class="btn btn-primary form-control">Login</button>
   </form>
 </div>
 

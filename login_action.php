@@ -1,0 +1,25 @@
+<?php 
+
+require_once("connect.php");
+session_start();
+
+$email = trim($_POST["email"]);
+$password = $_POST["password"];
+
+$stmt = $conn->prepare("SELECT user_id, firstname, lastname, email, password, role FROM users WHERE email=?");
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+
+if ($row && password_verify($password, $row["password"])) {
+    $_SESSION["name"] = $row["firstname"] . "  " . $row["lastname"];
+    $_SESSION["user_id"] = $row["user_id"];
+    header("Location: index.php");
+    exit;
+} else {
+        $_SESSION["login_error"] = "Invalid login. Please try again.";
+        header("Location: login.php");
+   }
+
+?>

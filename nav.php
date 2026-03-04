@@ -13,10 +13,10 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="link navbar-nav ms-auto">
                     <li class="m-2">
-                        <a class="nav-link link <?php echo ($current == "") ? "active" : ""; ?>" href="">Sign up</a>
+                        <a class="nav-link link <?php echo ($current == "") ? "active" : ""; ?>" href="signup.php">Sign up</a>
                     </li>
                     <li class="m-2">
-                        <a class="nav-link link <?php echo ($current == "") ? "active" : ""; ?>" href="">Log in</a>
+                        <a class="nav-link link <?php echo ($current == "") ? "active" : ""; ?>" href="login.php">Log in</a>
                     </li>
                 </ul>
             </div>

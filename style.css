@@ -28,7 +28,7 @@ body {
 
 #navigation {
     background-color: #7393b3;
-    border-bottom: 5px solid #ff0000;
+    border-bottom: 5px solid #000000;
 }
 
 .link {
@@ -52,9 +52,8 @@ body {
 }
 
 .link li a:hover:not(.active) {
-    background-color: #b39373;
-    color: #000000;
-    text-decoration-color: #000000;
+    color: #F4F4F4;
+    text-decoration-color: #F4F4F4;
 }
 
 .link li a:not(.active) {
@@ -97,13 +96,11 @@ body {
 }
 
 .sidebar a.active {
-    background-color: #b39373;
-    color: black;
+    color: #F4F4F4;
 }
 
 .sidebar a:hover:not(.active) {
-    background-color: #b39373;
-    color: #000000;
+    color: #F4F4F4;
 }
 
 .closed {
@@ -139,10 +136,38 @@ footer {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 125px;
+    height: 75px;
     width: 100%;
     background-color: #7393b3;
     position: absolute;
     bottom: 0;
     left: 0;
+    border-top: 5px solid #000000;
+}
+
+.form_container {
+    margin: 0 auto;
+    max-width: 500px;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+}
+
+.stat{
+    background:#fff;
+    border:1px solid #ddd;
+    border-radius:14px;
+    padding:16px;
+}
+
+.num{
+    font-size:28px;
+    font-weight:700;
+    margin-top:6px;
+}
+@media(max-width:800px){
+    .stats{grid-template-columns:1fr;}
 }

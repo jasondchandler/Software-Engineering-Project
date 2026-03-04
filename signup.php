@@ -1,3 +1,5 @@
+<?php session_start(); ?>
+
 <!DOCTYPE html>
 
 <html>
@@ -22,43 +24,49 @@
 
     </head>
 
-<?php include("nav.php"); ?>
+  <body>
 
-<div class="container" style="padding: 20px;">
-  <h2>Create Account</h2>
+  <div class="form_container">
+      <h2>Create Account</h2>
 
-<div style="padding-bottom:120px;">
+      <?php 
+      if (isset($_SESSION["signup_error"]) && !empty($_SESSION["signup_error"])) {
+        echo '<div class="alert alert-danger" role="alert">';
+        echo htmlspecialchars($_SESSION["signup_error"]);
+        echo "</div>";
+        unset($_SESSION["signup_error"]);
+      }
+      ?>
 
-  <form action="process_signup.php" method="POST">
-    <label>Username *</label><br>
-    <input type="text" name="username" required><br><br>
+      <form action="process_signup.php" method="POST">
+       
+        <label class="form-label">Email:</label>
+        <input type="email" class="form-control" name="email" required>
 
-    <label>Password *</label><br>
-    <input type="password" name="password" required><br><br>
+        <label class="form-label">Password:</label>
+        <input type="password" class="form-control" name="password" required>
 
-    <label>Confirm Password *</label><br>
-    <input type="password" name="password_confirm" required><br><br>
+        <label class="form-label">Confirm Password:</label>
+        <input type="password" class="form-control" name="password_confirm" required>
 
-    <label>First Name *</label><br>
-    <input type="text" name="firstname" required><br><br>
+        <label class="form-label">First Name:</label>
+        <input type="text" class="form-control" name="firstname" required>
 
-    <label>Last Name *</label><br>
-    <input type="text" name="lastname" required><br><br>
+        <label class="form-label">Last Name:</label>
+        <input type="text" class="form-control" name="lastname" required>
 
-    <label>Email *</label><br>
-    <input type="email" name="email" required><br><br>
+        <label class="form-label">Phone:</label>
+        <input type="text" class="form-control" name="phone">
 
-    <label>Phone (optional)</label><br>
-    <input type="text" name="phone"><br><br>
+        <label class="form-label">Address:</label>
+        <input type="text" class="form-control" name="address">
 
-    <label>Address (optional)</label><br>
-    <input type="text" name="address"><br><br>
-
-    <button type="submit" style="display:block; margin-top:20px; padding:12px 18px; font-size:16px;">
-  Sign Up
-</button>
+        <button type="submit" class="btn btn-primary form-control">
+      Sign Up
+    </button>
   </form>
 </div>  
-</div>
 
-<?php include("footer.php"); ?>
+  </body>
+
+</html>

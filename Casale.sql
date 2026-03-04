@@ -2,17 +2,18 @@
 -- Creates
 CREATE TABLE USERS (
     user_id int not null AUTO_INCREMENT,
-    username varchar(20) not null,
-    password varchar(20) not null, 
+    email varchar(20) not null,
+    password varchar(100) not null, 
     firstname varchar(20) not null,
     lastname varchar(20) not null,
-    email varchar(20) not null,
-    phone varchar(20) not null,
+    phone varchar(20) null,
     address varchar(20) null,
+    role varchar(20) default "client",
     CONSTRAINT User_PK PRIMARY KEY (user_id),
-    CONSTRAINT Unique_User UNIQUE (username),
     CONSTRAINT Unique_Email UNIQUE (email),
-    CONSTRAINT Unique_Phone UNIQUE (phone)
+    CONSTRAINT Unique_Phone UNIQUE (phone),
+    CONSTRAINT Check_Role CHECK 
+        (role IN ("client", "paralegal", "admin"))
 );
 
 CREATE TABLE CASES (
@@ -30,14 +31,17 @@ CREATE TABLE CASES (
 
 CREATE TABLE MEETINGS (
   meeting_id int NOT NULL AUTO_INCREMENT,
-  client_name varchar(150) NOT NULL,
-  title varchar(150)  NOT NULL,
+  meeting_date DATE NOT NULL,
+  meeting_time TIME NOT NULL,
+  location varchar(255) NOT NULL DEFAULT "Zoom",
+  duration int NOT NULL,           
   notes text NULL,
-  location varchar(255) NOT NULL,
   status enum('pending','scheduled','confirmed','completed','cancelled','no_show') NOT NULL DEFAULT 'pending',
+  user_id int NOT NULL,
   created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT Meeting_PK PRIMARY KEY (meeting_id)
+  CONSTRAINT Meeting_PK PRIMARY KEY (meeting_id),
+  CONSTRAINT Meeting_FK FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
 
 CREATE TABLE MEETING_TIMES (

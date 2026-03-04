@@ -1,4 +1,7 @@
-
+<?php 
+  session_start(); 
+  require_once("connect.php");
+?>
 <head>
 
     <title>Charles Casale - Home</title>
@@ -7,7 +10,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-        
+      
     <script src="site.js" defer></script>
     <link rel="stylesheet" href = "style.css">
     <link rel="icon" type="image/x-icon" href="">
@@ -21,63 +24,43 @@
 
 <body>
 
-    <?php include "nav.php"; ?>
+  <?php include "nav.php"; ?>
 
 
-    <div class = "main">
-        <br><br>
-        <?php
-require __DIR__ . "/config/db.php";
-session_start();
+  <div class = "main">
+    <br><br>
+      <?php
 
-if (empty($_SESSION["user"])) {
-    header("Location: login.php");
-    exit;
-}
+      if (empty($_SESSION["user"])) {
+        header("Location: login.php");
+	$_SESSION["login_message"] = "Please log in.";
+        exit;
+      }
 
 function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
 $pendingCount = 0;
 $upcomingCount = 0;
 
-$r1 = $conn->query("SELECT COUNT(*) AS c FROM appointments WHERE status='pending'");
+$r1 = $conn->query("SELECT COUNT(*) AS c FROM meetings WHERE status='pending'");
 if ($r1) { $pendingCount = (int)$r1->fetch_assoc()["c"]; }
 
 $r2 = $conn->query("
   SELECT COUNT(*) AS c
-  FROM appointments a
-  JOIN appointment_times t ON t.appointment_id = a.appointment_id
+  FROM meetings a
+  JOIN meeting_times t ON t.meeting_id = a.meeting_id
   WHERE a.status IN ('scheduled','confirmed')
     AND t.start_time >= NOW()
 ");
 if ($r2) { $upcomingCount = (int)$r2->fetch_assoc()["c"]; }
 ?>
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Dashboard</title>
-  <link rel="stylesheet" href="assets/style.css">
-  <style>
-    .stats{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-    .stat{background:#fff;border:1px solid #ddd;border-radius:14px;padding:16px;}
-    .num{font-size:28px;font-weight:700;margin-top:6px;}
-    @media(max-width:800px){.stats{grid-template-columns:1fr;}}
-  </style>
-</head>
-<body>
 
 <div class="container">
 
   <div class="nav">
     <div>
       <strong>Dashboard</strong>
-      <div class="small">Welcome back, <?php echo h($_SESSION["user"]["full_name"]); ?></div>
-    </div>
-    <div class="actions">
-      <a class="btn btn-dark" href="list_meetings.php">Open Meetings</a>
-      <a class="btn btn-light" href="create_meeting.php">New Meeting</a>
-      <a class="btn btn-red" href="logout.php">Logout</a>
+      <div class="small">Welcome back, <?php echo $_SESSION["name"]; ?></div>
     </div>
   </div>
 
@@ -94,16 +77,20 @@ if ($r2) { $upcomingCount = (int)$r2->fetch_assoc()["c"]; }
       <div class="num"><?php echo $upcomingCount; ?></div>
       <div class="small">Scheduled or confirmed</div>
     </div>
-
   </div>
 
-</div>
-</body>
-</html>
+  <button type="button" class="btn btn-primary w-100 mt-3 mb-3" data-bs-toggle="modal" data-bs-target="#createMeetingForm"> 
+    Create Meeting
+  </button>
 
-        <h1>Feed of appointments</h1>
-
-        <h3>Create Meeting Form</h3>
+  <div class="modal fade" id="createMeetingForm" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create Meeting</h5>
+        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+      </div>
+      <div class="modal-body">
         <form action="create_meeting.php" method="POST">
         
             <input type="hidden" name="meeting_id" value="<?php ?>">
@@ -137,6 +124,19 @@ if ($r2) { $upcomingCount = (int)$r2->fetch_assoc()["c"]; }
 
         </form>
 
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+        <h1>Your meetings: </h1>
+
+	<?php include "meeting_feed.php"?>
+        
         <br><br>
         <h3>Edit Meeting Form</h3>
         <form action="update_meeting.php" method="POST">
@@ -159,7 +159,7 @@ if ($r2) { $upcomingCount = (int)$r2->fetch_assoc()["c"]; }
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Duration (mins):</label>
+                <label class="form-label">Estimated Duration (mins):</label>
                 <input type="number" class="form-control" name="duration" min="1" max="180" value="<?php ?>" required>
             </div>
 
@@ -168,7 +168,7 @@ if ($r2) { $upcomingCount = (int)$r2->fetch_assoc()["c"]; }
                 <textarea name="notes" class="form-control"> </textarea>
             </div>
 
-            <button type="submit" class = "btn btn-primary form-control">Update Meeting</button>
+            <button type="submit" class="btn btn-primary form-control">Update Meeting</button>
 
         </form>
 
