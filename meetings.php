@@ -57,7 +57,7 @@
 
     <div class="nav">
       <div>
-        <strong>Dashboard</strong>
+        <h1>Meeting Dashboard</h1>
         <div class="small">Welcome back, <?php echo $_SESSION["name"]; ?></div>
       </div>
     </div>
@@ -82,6 +82,22 @@
     </button>
 
     <?php 
+    
+      if ($_SESSION["role"] === "admin") {
+        echo '<button type="button" class="btn btn-dark w-100 mt-3 mb-3" data-bs-toggle="modal" data-bs-target="#unavailableTimeForm"> 
+          Set Unavailiable Times
+        </button><br>';
+
+         echo '<button type="button" class="btn btn-dark w-100 mt-3 mb-3" data-bs-toggle="modal" data-bs-target="#removeTimesForm"> 
+          Remove Unavailiable Times
+        </button><br>';
+      }
+
+
+    
+    ?>
+
+    <?php 
       $show_modal = false;
       if (!empty($_SESSION["create_meeting_error"])) {
           $show_modal = true;
@@ -93,7 +109,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Create Meeting</h5>
-            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <form action="create_meeting.php" method="POST">
@@ -110,26 +126,26 @@
               }
               ?>
 
-              <input type="hidden" name="meeting_id" value="<?php ?>">
+              <input type="hidden" name="meeting_id" >
 
               <div class="mb-3">
                   <label class="form-label">Date:</label>
-                  <input type="date" class="form-control" name="date" value="<?php  ?>" required>
+                  <input type="date" class="form-control" name="date" required>
               </div>
 
               <div class="mb-3">
                   <label class="form-label">Time:</label>
-                  <input type="time" class="form-control" name="time" value="<?php  ?>" required>
+                  <input type="time" class="form-control" name="time" min="09:00" max="17:00" required>
               </div>
 
               <div class="mb-3">
                   <label class="form-label">Location:</label>
-                  <input type="text" class="form-control" name="location" value="<?php ?>" required>
+                  <input type="text" class="form-control" name="location"  required>
               </div>
 
               <div class="mb-3">
                   <label class="form-label">Duration (mins):</label>
-                <input type="number" class="form-control" name="duration" min="1" max="180" value="<?php ?>" required>
+                <input type="number" class="form-control" name="duration" min="1" max="180"  required>
               </div>
 
               <div class="mb-3">
@@ -159,6 +175,94 @@
               <button type="submit" class = "btn btn-primary form-control">Create Meeting</button>
 
             </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="unavailableTimeForm" data-show="<?php echo !empty($show_modal) ? 'true' : 'false'; ?>" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Set Unavailable Times</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form action="set_unavailable_times.php" method="POST">
+
+              <div class="mb-3">
+                  <label class="form-label">Date:</label>
+                  <input type="date" class="form-control" name="date" required>
+              </div>
+
+              <div class="mb-3">
+                  <label class="form-label">Start Time:</label>
+                  <input type="time" class="form-control" name="start_time" min="09:00" max="17:00" required>
+              </div>
+
+              <div class="mb-3">
+                  <label class="form-label">End Time:</label>
+                  <input type="time" class="form-control" name="end_time" min="09:00" max="17:00" required>
+              </div>
+
+              <div class="mb-3">
+                  <label class="form-label">Repeat Weekly?:</label>
+                  <input type="checkbox" id="repeat" name="repeat">
+              </div>
+
+              <button type="submit" class = "btn btn-primary form-control">Ban Times</button>
+
+            </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="removeTimesForm" data-show="<?php echo !empty($show_modal) ? 'true' : 'false'; ?>" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Set Unavailable Times</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <?php 
+          
+            $sql = "select times_id, date, start_time, end_time, repeat_weekly from unavailable_times";
+            $result = $conn->query($sql);
+            $unavailable_times = [];
+            if ($result->num_rows > 0) {
+
+                while ($row = $result->fetch_assoc()) {
+                    $unavailable_times[] = $row;
+                }
+
+            }
+          ?>
+
+          <div class="modal-body">
+            <?php if (!empty($unavailable_times)):?>
+              <form action = "remove_times.php" method="POST">
+                <label class="form-label">Select Time to Remove:</label>
+                <select name="unavailable_id" class="form-select" required>
+
+                  <?php foreach ($unavailable_times as $time): ?>
+
+                    <option value="<?php echo $time['times_id']; ?>">
+                      <?php echo $time['date'] . " | " . substr($time['start_time'],0,5) . " - " . substr($time['end_time'],0,5); ?>
+                      <?php echo $time['repeat_weekly'] ? " (Repeats Weekly)" : ""; ?></option>
+
+                  <?php endforeach; ?>
+                </select>
+                <button type="submit" class = "btn btn-primary form-control">Remove Selected Unavailable Time</button>
+
+              </form>
+
+
+
+            <?php endif; ?>
 
       </div>
     </div>

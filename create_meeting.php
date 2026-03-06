@@ -33,7 +33,7 @@
     $buffered_start = $buffered_start->format("Y-m-d H:i:s");  
     $buffered_end = $buffered_end->format("Y-m-d H:i:s");
 
-    // Check for overlaps
+    // check for times that are already booked
     $sql = "
         select count(*) AS time_conflicts
         from meeting_times mt
@@ -53,6 +53,25 @@
            header("Location: meetings.php");
            exit;
         }
+
+    // check unavailable times
+    $stmt = $conn->prepare("
+    SELECT * FROM unavailable_times
+    WHERE date = ?
+      AND (? < end_time AND ? > start_time)");
+
+    $buffered_start_time = (new DateTime($buffered_start))->format("H:i:s");
+    $buffered_end_time = (new DateTime($buffered_end))->format("H:i:s");
+    $stmt->bind_param("sss", $date, $buffered_start_time, $buffered_end_time);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $_SESSION["create_meeting_error"] = "This time is unavailable. Select a new time or date.";
+        header("Location: meetings.php");
+        exit;
+    }
 
 
     $sql = "INSERT INTO MEETINGS (location, duration, notes, user_id)

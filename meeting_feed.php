@@ -7,7 +7,7 @@ if ($_SESSION["role"] === "client") {
          m.duration,mt.start_time, mt.end_time
   FROM meetings m
   LEFT JOIN meeting_times mt ON mt.meeting_id = m.meeting_id
-  WHERE m.user_id = ? 
+  WHERE m.status != 'cancelled' AND m.user_id = ? 
   ORDER BY mt.start_time ASC";
   $stmt = $conn->prepare($sql);
   $stmt->bind_param("i", $_SESSION["user_id"]);
@@ -45,23 +45,25 @@ if ($_SESSION["role"] === "client") {
             <span>Location: <?php echo $row["location"];?></span><br>
             
             <?php 
-            echo '<span>Participants: ';
-            echo $row["firstname"] . ' ' . $row["lastname"] . ' | ' . $row["email"];
-            
-            ?></span>;
-
-            <hr>
+            if ($_SESSION["role"] === "admin") {
+              echo '<span>Participants: ';
+              echo $row["firstname"] . ' ' . $row["lastname"] . ' | ' . $row["email"] . '<br>';
+            }
+            ?></span>
 
             <?php 
-              if(!isset($row["notes"])) {
-                echo "<span>Notes: " . htmlspecialchars($row["notes"]) . "</span><br>";
+              if ($row["notes"] !== null && $row["notes"] !== "") {
+                  echo "<span>Notes: " . htmlspecialchars($row["notes"]) . "</span><br>";
+              } else {
+                  echo "<span>Notes: None</span><br>";
               }
             ?>
+            <hr>
             <div class="d-flex w-100 gap-2">
               <?php if ($_SESSION["role"] === "admin") {
                 echo '<button class="btn btn-success flex-fill" data-bs-toggle="modal" data-bs-target="#confirmMeeting">Confirm</button>';
               }?>
-              <button class="btn btn-warning flex-fill" data-bs-toggle="modal" data-bs-target="#editMeetingForm">Edit</button>
+              <button class="btn btn-warning flex-fill" data-bs-toggle="modal" data-bs-target="#editMeetingForm<?= $row['meeting_id'] ?>">Edit</button>
               <button class="btn btn-danger flex-fill" data-bs-toggle="modal" data-bs-target="#deleteMeeting<?= $row['meeting_id'] ?>">Delete</button>
             </div>
 
@@ -87,22 +89,37 @@ if ($_SESSION["role"] === "client") {
           </div>
         </div>
 
-              <div class="modal fade" id="editMeetingForm" tabindex="-1" role="dialog" aria-hidden="true">
+              <div class="modal fade" id="editMeetingForm<?= $row['meeting_id'] ?>" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog">
                   <div class="modal-content">
                     <div class="modal-header">
                       <h5 class="modal-title">Edit Meeting</h5>
-                      <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
-                      
-                      <?php include "edit_meeting_form.php"?>
 
+                    <div class="modal-body">
+                      <form action="edit_meeting.php" method="POST">
+                        <input type="hidden" name="meeting_id" value="<?php echo $row['meeting_id']; ?>">
+                            <label class="form-label">Date:</label>
+                            <input type="date" class="form-control mb-3" name="date" value="<?php echo (new DateTime($row["start_time"]))->format("Y-m-d"); ?>" required>
+                        
+                            <label class="form-label">Time:</label>
+                            <input type="time" class="form-control mb-3" name="time" min="09:00" max="17:00" value="<?php echo (new DateTime($row['start_time']))->format("H:i:s"); ?>" required>
+                                               
+                            <label class="form-label">Location:</label>
+                            <input type="text" class="form-control mb-3" name="location" value="<?php echo $row['location'];?>" required>
+                                              
+                            <label class="form-label">Estimated Duration (mins):</label>
+                            <input type="number" class="form-control mb-3" name="duration" min="15" max="180" value="<?php echo $row['duration'];?>" required>
+                                              
+                            <label class="form-label">Notes:</label>
+                            <textarea name="notes" class="form-control mb-3"><?php echo htmlspecialchars($row["notes"]); ?></textarea>
+                        <button type="submit" class="btn btn-dark form-control">Update Meeting</button>
+                      </form>
                   </div>
                 </div>
               </div>
-            </div>
-
+              </div>
               <div class="modal fade" id="deleteMeeting<?= $row['meeting_id']?>" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
           <div class="modal-dialog">
             <div class="modal-content">

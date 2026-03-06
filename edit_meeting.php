@@ -20,7 +20,7 @@
             SET location=?, duration=?, notes=?
             WHERE meeting_id=?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssi", $location, $duration, $notes, $id);
+    $stmt->bind_param("sisi", $location, $duration, $notes, $id);
     $stmt->execute();
 
     $sql = "UPDATE MEETING_TIMES

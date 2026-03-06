@@ -49,6 +49,15 @@ CREATE TABLE CASES (
     CONSTRAINT Case_Status_Check CHECK 
         (status IN ("Open", "Closed", "Pending", "Appeal"))
 );
+
+CREATE TABLE UNAVAILABLE_TIMES (
+    times_id INT AUTO_INCREMENT,
+    date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    repeat_weekly BOOLEAN DEFAULT FALSE,
+    CONSTRAINT Times_PK Primary Key (times_id)
+);
  
 
 
