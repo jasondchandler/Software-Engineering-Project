@@ -81,7 +81,14 @@
       Create Meeting
     </button>
 
-    <div class="modal fade" id="createMeetingForm" tabindex="-1" role="dialog" aria-hidden="true">
+    <?php 
+      $show_modal = false;
+      if (!empty($_SESSION["create_meeting_error"])) {
+          $show_modal = true;
+      }
+    ?>
+
+    <div class="modal fade" id="createMeetingForm" data-show="<?php echo !empty($show_modal) ? 'true' : 'false'; ?>" tabindex="-1" role="dialog" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -91,6 +98,18 @@
           <div class="modal-body">
             <form action="create_meeting.php" method="POST">
           
+              <?php
+              if (!empty($_SESSION["create_meeting_error"])) {
+                  echo '<div class="alert alert-danger text-center" role="alert">';
+                  echo htmlspecialchars("There is a time conflict.");
+                  echo "</div>";
+                  $show_modal = true;
+                  unset($_SESSION["create_meeting_error"]); 
+              } else {
+                  $show_modal = false;
+              }
+              ?>
+
               <input type="hidden" name="meeting_id" value="<?php ?>">
 
               <div class="mb-3">
@@ -115,8 +134,27 @@
 
               <div class="mb-3">
                 <label class="form-label">Notes:</label>
-                <textarea name="notes" class="form-control"> </textarea>
+                <textarea name="notes" class="form-control"></textarea>
               </div>
+
+              <?php 
+
+                if ($_SESSION["role"] === "admin") {
+                  $result = $conn->query("SELECT user_id, firstname, lastname, email FROM users");
+
+                  echo '<div class="mb-3">
+                          <label class="form-label">Select a user to meet with:</label>
+                          <select name="user_id" class="form-control">';
+
+                  while ($row = $result->fetch_assoc()) {
+                      echo '<option value="' . $row["user_id"] . '">'
+                          . $row["firstname"] . ' ' . $row["lastname"] . ' | ' . $row["email"] .
+                          '</option>';
+                  }
+
+                  echo '</select></div>';
+                  }
+              ?>
 
               <button type="submit" class = "btn btn-primary form-control">Create Meeting</button>
 

@@ -10,39 +10,41 @@ $firstname = $_POST["firstname"];
 $lastname = $_POST["lastname"];
 $phone = $_POST["phone"];
 $address = $_POST["address"];
+$_SESSION["signup_error"] = [];
 
 // Check required fields
 if (!$password || !$password_confirm || !$firstname || !$lastname || !$email) {
-    $_SESSION["signup_error"] = "Please fill in all required fields.";
-    header("Location: signup.php");
+    $_SESSION["signup_error"][] = "Please fill in all required fields.";
 }
 
 // Check password match
 if ($password !== $password_confirm) {
-    $_SESSION["signup_error"] = "Passwords do not match.";
-    header("Location: signup.php");
+    $_SESSION["signup_error"][] = "Passwords do not match.";
 }
 
 // Check if email is unique
 $stmt = $conn->prepare("select email from users where email = ?");
-$stmt->bind_param("i", $user_id);
+$stmt->bind_param("i", $email);
 $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
-    $_SESSION["signup_error"] = "Email taken. Please use another.";
-    header("Location: signup.php");
+    $_SESSION["signup_error"][] = "Email taken. Please use another.";
 }
 
 // Check if phone is unique
 $stmt = $conn->prepare("select phone from users where phone = ?");
-$stmt->bind_param("i", $user_id);
+$stmt->bind_param("i", $phone);
 $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
-    $_SESSION["signup_error"] = "Phone number taken. Please use another.";
+    $_SESSION["signup_error"][] = "Phone number taken. Please use another.";
+}
+
+if (!empty($_SESSION["signup_error"])) {
     header("Location: signup.php");
+    exit;
 }
 
 // Hash password

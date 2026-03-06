@@ -24,4 +24,11 @@ function toggleSide() {
         }
     }
 
-
+// for failures in create meeting (bad times)
+document.addEventListener("DOMContentLoaded", function () {
+    const createMeetingModal = document.getElementById("createMeetingForm");
+    if (createMeetingModal && createMeetingModal.dataset.show === "true") {
+        const modal = new bootstrap.Modal(createMeetingModal);
+        modal.show();
+    }
+});

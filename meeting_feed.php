@@ -13,12 +13,14 @@ if ($_SESSION["role"] === "client") {
   $stmt->bind_param("i", $_SESSION["user_id"]);
   $stmt->execute();
   $result = $stmt->get_result();
-} else {
+} elseif ($_SESSION["role"] === "admin") {
   $sql = "
     SELECT m.meeting_id, m.notes, m.status, m.location,
-          m.duration,mt.start_time, mt.end_time
+          m.duration,mt.start_time, mt.end_time, u.firstname, u.lastname, u.email
     FROM meetings m
     LEFT JOIN meeting_times mt ON mt.meeting_id = m.meeting_id
+    LEFT JOIN users u ON m.user_id = u.user_id
+    WHERE m.status != 'cancelled'
     ORDER BY mt.start_time ASC";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
@@ -40,7 +42,16 @@ if ($_SESSION["role"] === "client") {
                 echo $formatted_time;
               ?>
             </span><br>
-            <span>Location: <?php echo $row["location"];?></span><br><hr>
+            <span>Location: <?php echo $row["location"];?></span><br>
+            
+            <?php 
+            echo '<span>Participants: ';
+            echo $row["firstname"] . ' ' . $row["lastname"] . ' | ' . $row["email"];
+            
+            ?></span>;
+
+            <hr>
+
             <?php 
               if(!isset($row["notes"])) {
                 echo "<span>Notes: " . htmlspecialchars($row["notes"]) . "</span><br>";

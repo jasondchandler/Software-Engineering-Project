@@ -27,12 +27,16 @@
   <body>
 
   <div class="form_container">
-      <h2>Create Account</h2>
+
+      <h2>Sign up</h2>
+      <hr>
 
       <?php 
       if (isset($_SESSION["signup_error"]) && !empty($_SESSION["signup_error"])) {
-        echo '<div class="alert alert-danger" role="alert">';
-        echo htmlspecialchars($_SESSION["signup_error"]);
+        echo '<div class="alert alert-danger text-center" role="alert">';
+        foreach ($_SESSION["signup_error"] as $error) {
+            echo $error . "<br>";
+        }
         echo "</div>";
         unset($_SESSION["signup_error"]);
       }
@@ -41,29 +45,33 @@
       <form action="process_signup.php" method="POST">
        
         <label class="form-label">Email:</label>
-        <input type="email" class="form-control" name="email" required>
+        <input type="email" class="form-control mb-3" name="email" required>
 
         <label class="form-label">Password:</label>
-        <input type="password" class="form-control" name="password" required>
+        <input type="password" class="form-control mb-3" name="password" required>
 
         <label class="form-label">Confirm Password:</label>
-        <input type="password" class="form-control" name="password_confirm" required>
+        <input type="password" class="form-control mb-3" name="password_confirm" required>
 
         <label class="form-label">First Name:</label>
-        <input type="text" class="form-control" name="firstname" required>
+        <input type="text" class="form-control mb-3" name="firstname" required>
 
         <label class="form-label">Last Name:</label>
-        <input type="text" class="form-control" name="lastname" required>
+        <input type="text" class="form-control mb-3" name="lastname" required>
 
         <label class="form-label">Phone:</label>
-        <input type="text" class="form-control" name="phone">
+        <input type="text" class="form-control mb-3" name="phone">
 
         <label class="form-label">Address:</label>
-        <input type="text" class="form-control" name="address">
+        <input type="text" class="form-control mb-3" name="address">
 
-        <button type="submit" class="btn btn-primary form-control">
-      Sign Up
-    </button>
+        <button type="submit" class="btn btn-dark form-control mb-3">
+        Sign Up
+        </button>
+
+        <hr>
+        <p>Already have an account? <a href="login.php">Click here to login.</a></p>
+        <p><a href="index.php">Click here to return to home page.</a></p>
   </form>
 </div>  
 

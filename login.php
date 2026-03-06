@@ -27,24 +27,26 @@ session_start();
 
 <div class="form_container">
   <h2>Login</h2>
-
+  <hr>
   <?php 
     if (isset($_SESSION["login_error"]) && !empty($_SESSION["login_error"])) {
-      echo '<div class="alert alert-danger" role="alert">';
+      echo '<div class="alert alert-danger text-center" role="alert">';
       echo htmlspecialchars($_SESSION["login_error"]);
       echo "</div>";
       unset($_SESSION["login_error"]);
     }
   ?>
 
-  <form action="login_action.php" method="POST">
+  <form action="login_action.php" method="POST" class="form_style">
     <label class="form-label">Email:</label>
-        <input type="email" class="form-control" name="email" required>  
+    <input type="email" class="form-control mb-3" name="email" required>  
 
     <label class="form-label">Password</label>
-    <input type="password" name="password" class="form-control" required>
+    <input type="password" name="password" class="form-control mb-3" required>
 
-    <button class="btn btn-primary form-control">Login</button>
+    <button class="btn btn-dark form-control mb-3">Login</button>
+    <hr>
+    <p>No account? <a href="signup.php">Click here to sign up.</a></p>
   </form>
 </div>
 

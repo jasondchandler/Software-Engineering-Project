@@ -49,36 +49,7 @@ CREATE TABLE CASES (
     CONSTRAINT Case_Status_Check CHECK 
         (status IN ("Open", "Closed", "Pending", "Appeal"))
 );
-
-
--- Sample data
-INSERT INTO USERS 
-    VALUES ("AdminCasale", "1", "Charles", "Casale", "casale@gmail.com", "1112223456");
-
-INSERT INTO USERS 
-    VALUES ("jason12", "2", "Jason", "Chandler", "jason@gmail.com", "1234567890");
-
-INSERT INTO USERS 
-    VALUES ("Chiemela", "3", "Chiemela", "Francis", "chiemela@gmail.com", "0987654321");
-
-INSERT INTO USERS 
-    VALUES ("Stephen", "4", "Stephen", "Escalante", "stephen@gmail.com", "4561237890");
-
-INSERT INTO USERS 
-    VALUES ("William", "5", "William", "Mazal", "william@gmail.com", "789012345");
-
-
-INSERT INTO CASES
-    VALUES ("Chandler v. State", "New Jersey Superior Court", 
-            "criminal", "2026-02-05", "open");
-
-INSERT INTO CASES
-    VALUES ("Francis v. Smith", "Philadelphia Municiple Court", 
-            "negligence", "2026-01-28", "open");    
-
-INSERT INTO CASES
-    VALUES ("Mazal v. Mayo", "Central Municiple Court", 
-            "matrimonial", "2026-02-09", "open");    
+ 
 
 
 
