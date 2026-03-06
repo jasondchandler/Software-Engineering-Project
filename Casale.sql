@@ -16,6 +16,28 @@ CREATE TABLE USERS (
         (role IN ("client", "paralegal", "admin"))
 );
 
+CREATE TABLE MEETINGS (
+  meeting_id int NOT NULL AUTO_INCREMENT,
+  location varchar(255) NOT NULL DEFAULT "Zoom",
+  duration int NOT NULL,           
+  notes text NULL,
+  status enum('pending','confirmed','completed','cancelled','no_show') NOT NULL DEFAULT 'pending',
+  user_id int NOT NULL,
+  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT Meeting_PK PRIMARY KEY (meeting_id),
+  CONSTRAINT Meeting_FK FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
+CREATE TABLE MEETING_TIMES (
+  meeting_time_id int NOT NULL AUTO_INCREMENT,
+  meeting_id int NOT NULL,
+  start_time datetime NOT NULL,
+  end_time datetime NOT NULL,
+  CONSTRAINT Meeting_Time_PK PRIMARY KEY (meeting_time_id),
+  CONSTRAINT Meeting_Time_FK FOREIGN KEY (meeting_id) REFERENCES Meetings(meeting_id)
+);
+
 CREATE TABLE CASES (
     case_id int not null AUTO_INCREMENT,
     title varchar(50) not null,
@@ -26,30 +48,6 @@ CREATE TABLE CASES (
     CONSTRAINT Case_PK PRIMARY KEY (case_id),
     CONSTRAINT Case_Status_Check CHECK 
         (status IN ("Open", "Closed", "Pending", "Appeal"))
-);
-
-
-CREATE TABLE MEETINGS (
-  meeting_id int NOT NULL AUTO_INCREMENT,
-  meeting_date DATE NOT NULL,
-  meeting_time TIME NOT NULL,
-  location varchar(255) NOT NULL DEFAULT "Zoom",
-  duration int NOT NULL,           
-  notes text NULL,
-  status enum('pending','scheduled','confirmed','completed','cancelled','no_show') NOT NULL DEFAULT 'pending',
-  user_id int NOT NULL,
-  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT Meeting_PK PRIMARY KEY (meeting_id),
-  CONSTRAINT Meeting_FK FOREIGN KEY (user_id) REFERENCES Users(user_id)
-);
-
-CREATE TABLE MEETING_TIMES (
-  meeting_time_id int NOT NULL,
-  meeting_id int NOT NULL,
-  start_time datetime NOT NULL,
-  end_time datetime NOT NULL,
-  CONSTRAINT Meeting_PK PRIMARY KEY (meeting_time_id)
 );
 
 

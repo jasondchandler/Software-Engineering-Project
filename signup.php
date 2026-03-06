@@ -6,7 +6,7 @@
 
     <head>
 
-        <title>Charles Casale - Signup</title>
+        <title>Charles Casale - Sign up</title>
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 

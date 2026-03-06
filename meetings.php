@@ -4,7 +4,7 @@
 ?>
 <head>
 
-    <title>Charles Casale - Home</title>
+    <title>Charles Casale - Meetings</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -28,101 +28,99 @@
 
 
   <div class = "main">
-    <br><br>
       <?php
 
-      if (empty($_SESSION["user"])) {
+      if (empty($_SESSION["user_id"])) {
         header("Location: login.php");
-	$_SESSION["login_message"] = "Please log in.";
+	      $_SESSION["login_error"] = "Please log in.";
         exit;
       }
 
-function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
+      function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
-$pendingCount = 0;
-$upcomingCount = 0;
+      $pendingCount = 0;
+      $upcomingCount = 0;
 
-$r1 = $conn->query("SELECT COUNT(*) AS c FROM meetings WHERE status='pending'");
-if ($r1) { $pendingCount = (int)$r1->fetch_assoc()["c"]; }
+      $r1 = $conn->query("SELECT COUNT(*) AS c FROM meetings WHERE status='pending'");
+      if ($r1) { $pendingCount = (int)$r1->fetch_assoc()["c"]; }
 
-$r2 = $conn->query("
-  SELECT COUNT(*) AS c
-  FROM meetings a
-  JOIN meeting_times t ON t.meeting_id = a.meeting_id
-  WHERE a.status IN ('scheduled','confirmed')
-    AND t.start_time >= NOW()
-");
-if ($r2) { $upcomingCount = (int)$r2->fetch_assoc()["c"]; }
-?>
+      $r2 = $conn->query("
+        SELECT COUNT(*) AS c
+        FROM meetings m
+        JOIN meeting_times mt ON mt.meeting_id = m.meeting_id
+        WHERE m.status IN ('confirmed')
+      ");
+      if ($r2) { $upcomingCount = (int)$r2->fetch_assoc()["c"]; }
+      ?>
 
-<div class="container">
+  <div class="container">
 
-  <div class="nav">
-    <div>
-      <strong>Dashboard</strong>
-      <div class="small">Welcome back, <?php echo $_SESSION["name"]; ?></div>
-    </div>
-  </div>
-
-  <div class="stats">
-
-    <div class="stat">
-      <div class="small">Pending Requests</div>
-      <div class="num"><?php echo $pendingCount; ?></div>
-      <div class="small">Awaiting review</div>
-    </div>
-
-    <div class="stat">
-      <div class="small">Upcoming Meetings</div>
-      <div class="num"><?php echo $upcomingCount; ?></div>
-      <div class="small">Scheduled or confirmed</div>
-    </div>
-  </div>
-
-  <button type="button" class="btn btn-primary w-100 mt-3 mb-3" data-bs-toggle="modal" data-bs-target="#createMeetingForm"> 
-    Create Meeting
-  </button>
-
-  <div class="modal fade" id="createMeetingForm" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Create Meeting</h5>
-        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+    <div class="nav">
+      <div>
+        <strong>Dashboard</strong>
+        <div class="small">Welcome back, <?php echo $_SESSION["name"]; ?></div>
       </div>
-      <div class="modal-body">
-        <form action="create_meeting.php" method="POST">
-        
-            <input type="hidden" name="meeting_id" value="<?php ?>">
+    </div>
 
-            <div class="mb-3">
-                <label class="form-label">Date:</label>
-                <input type="date" class="form-control" name="date" value="<?php  ?>" required>
-            </div>
+    <div class="stats">
 
-            <div class="mb-3">
-                <label class="form-label">Time:</label>
-                <input type="time" class="form-control" name="time" value="<?php  ?>" required>
-            </div>
+      <div class="stat">
+        <div class="small">Pending Requests</div>
+        <div class="num"><?php echo $pendingCount; ?></div>
+        <div class="small">Awaiting review</div>
+      </div>
 
-            <div class="mb-3">
-                <label class="form-label">Location:</label>
-                <input type="text" class="form-control" name="location" value="<?php ?>" required>
-            </div>
+      <div class="stat">
+        <div class="small">Upcoming Meetings</div>
+        <div class="num"><?php echo $upcomingCount; ?></div>
+        <div class="small">Scheduled</div>
+      </div>
+    </div>
 
-            <div class="mb-3">
-                <label class="form-label">Duration (mins):</label>
+    <button type="button" class="btn btn-dark w-100 mt-3 mb-3" data-bs-toggle="modal" data-bs-target="#createMeetingForm"> 
+      Create Meeting
+    </button>
+
+    <div class="modal fade" id="createMeetingForm" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Create Meeting</h5>
+            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+          </div>
+          <div class="modal-body">
+            <form action="create_meeting.php" method="POST">
+          
+              <input type="hidden" name="meeting_id" value="<?php ?>">
+
+              <div class="mb-3">
+                  <label class="form-label">Date:</label>
+                  <input type="date" class="form-control" name="date" value="<?php  ?>" required>
+              </div>
+
+              <div class="mb-3">
+                  <label class="form-label">Time:</label>
+                  <input type="time" class="form-control" name="time" value="<?php  ?>" required>
+              </div>
+
+              <div class="mb-3">
+                  <label class="form-label">Location:</label>
+                  <input type="text" class="form-control" name="location" value="<?php ?>" required>
+              </div>
+
+              <div class="mb-3">
+                  <label class="form-label">Duration (mins):</label>
                 <input type="number" class="form-control" name="duration" min="1" max="180" value="<?php ?>" required>
-            </div>
+              </div>
 
-            <div class="mb-3">
+              <div class="mb-3">
                 <label class="form-label">Notes:</label>
                 <textarea name="notes" class="form-control"> </textarea>
-            </div>
+              </div>
 
-            <button type="submit" class = "btn btn-primary form-control">Create Meeting</button>
+              <button type="submit" class = "btn btn-primary form-control">Create Meeting</button>
 
-        </form>
+            </form>
 
       </div>
     </div>
@@ -131,47 +129,11 @@ if ($r2) { $upcomingCount = (int)$r2->fetch_assoc()["c"]; }
 
 
 
-</div>
 
+<br><br>
         <h1>Your meetings: </h1>
 
 	<?php include "meeting_feed.php"?>
-        
-        <br><br>
-        <h3>Edit Meeting Form</h3>
-        <form action="update_meeting.php" method="POST">
-        
-            <input type="hidden" name="meeting_id" value="<?php  ?>">
 
-            <div class="mb-3">
-                <label class="form-label">Date:</label>
-                <input type="date" class="form-control" name="date" value="<?php  ?>" required>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Time:</label>
-                <input type="time" class="form-control" name="time" value="<?php  ?>" required>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Location:</label>
-                <input type="text" class="form-control" name="location" value="<?php ?>" required>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Estimated Duration (mins):</label>
-                <input type="number" class="form-control" name="duration" min="1" max="180" value="<?php ?>" required>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Notes:</label>
-                <textarea name="notes" class="form-control"> </textarea>
-            </div>
-
-            <button type="submit" class="btn btn-primary form-control">Update Meeting</button>
-
-        </form>
-
-    </div>
 
 </body>

@@ -6,7 +6,7 @@ session_start();
 <html>
  <head>
 
-        <title>Charles Casale - Home</title>
+        <title>Charles Casale - Log in</title>
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 

@@ -60,11 +60,23 @@ $stmt->bind_param("ssssss", $email, $password_hash, $firstname, $lastname, $phon
 
 // Execute
 if ($stmt->execute()) {
-    $_SESSION["name"] = $firstname . $lastname;
-    $stmt = $conn->prepare("select user_id from users where email = $email");
+    $_SESSION["name"] = $firstname . " " . $lastname;
+    $stmt = $conn->prepare("select user_id from users where email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
     $result = $stmt->get_result();
-    $row = $result->fetch_assoc()	
+    $row = $result->fetch_assoc();	
     $_SESSION["user_id"] = $row["user_id"];
+
+    // this will need to be changed
+    if ($_SESSION["name"] === "charles casale") {
+        $_SESSION["role"] = "admin";
+    } else {
+        $_SESSION["role"] = "client";
+    }
+
+    
+
     header("Location: index.php");
 } else {
     $_SESSION["signup_error"] = "Please try again.";

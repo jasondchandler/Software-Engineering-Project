@@ -13,8 +13,13 @@ $result = $stmt->get_result();
 $row = $result->fetch_assoc();
 
 if ($row && password_verify($password, $row["password"])) {
-    $_SESSION["name"] = $row["firstname"] . "  " . $row["lastname"];
+    $_SESSION["name"] = $row["firstname"] . " " . $row["lastname"];
     $_SESSION["user_id"] = $row["user_id"];
+    if ($_SESSION["name"] === "charles casale") {
+        $_SESSION["role"] = "admin";
+    } else {
+        $_SESSION["role"] = "client";
+    }
     header("Location: index.php");
     exit;
 } else {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-
+<?php session_start();?>
 <html>
 
     <head>
@@ -27,31 +27,14 @@
         <?php include "nav.php"; ?>
 
         <div id="main" class = "main">
-            <div class = "container d-flex justify-content-center m-5">
-                <div class="row d-flex justify-content-center">
-                    <div class="col-sm d-flex justify-content-center columns m-2">
-                        Content
-                    </div>
-                    <div class="col-sm d-flex justify-content-center columns m-2">
-                        Content
-                    </div>
-                    <div class="col-sm d-flex justify-content-center columns m-2">
-                        Content
-                    </div>
-                </div>
-            </div>
 
             <div class = "container">
-
                 <h2> Content </h2>
                 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae ipsa neque quibusdam eius debitis ut deleniti dolores, incidunt, rerum exercitationem tempora nobis explicabo obcaecati, laborum blanditiis. Unde dolorum veritatis architecto!
                 </p>
-                <br><br>
-                <p>Add the links to your pages/forms in the nav.php file<p>
-            
-            </div>
 
-            <?php include "footer.php"; ?>
+                <br><br>
+            </div>
 
         </div>
 
