@@ -38,7 +38,7 @@
         select count(*) AS time_conflicts
         from meeting_times mt
         join meetings m ON m.meeting_id = mt.meeting_id
-        where m.status <> 'cancelled'
+        where m.status != 'cancelled'
         and (
         mt.start_time < ? AND mt.end_time > ?
         )";
@@ -57,7 +57,7 @@
     // check unavailable times
     $stmt = $conn->prepare("
     SELECT * FROM unavailable_times
-    WHERE date = ?
+    WHERE (repeat_daily = 1 OR date = ?)
       AND (? < end_time AND ? > start_time)");
 
     $buffered_start_time = (new DateTime($buffered_start))->format("H:i:s");

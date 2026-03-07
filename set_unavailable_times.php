@@ -6,7 +6,7 @@
 
     $repeat = isset($_POST["repeat"]) ? 1 : 0;
 
-    $stmt = $conn->prepare("insert into unavailable_times (date, start_time, end_time, repeat_weekly) VALUES (?, ?, ?, ?)");
+    $stmt = $conn->prepare("insert into unavailable_times (date, start_time, end_time, repeat_daily) VALUES (?, ?, ?, ?)");
     $stmt->bind_param("sssi", $date, $start, $end, $repeat);
     $stmt->execute();
     $stmt->close();

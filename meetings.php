@@ -117,7 +117,7 @@
               <?php
               if (!empty($_SESSION["create_meeting_error"])) {
                   echo '<div class="alert alert-danger text-center" role="alert">';
-                  echo htmlspecialchars("There is a time conflict.");
+                  echo htmlspecialchars($_SESSION["create_meeting_error"]);
                   echo "</div>";
                   $show_modal = true;
                   unset($_SESSION["create_meeting_error"]); 
@@ -207,7 +207,7 @@
               </div>
 
               <div class="mb-3">
-                  <label class="form-label">Repeat Weekly?:</label>
+                  <label class="form-label">Repeat Daily?:</label>
                   <input type="checkbox" id="repeat" name="repeat">
               </div>
 
@@ -230,7 +230,7 @@
 
           <?php 
           
-            $sql = "select times_id, date, start_time, end_time, repeat_weekly from unavailable_times";
+            $sql = "select times_id, date, start_time, end_time, repeat_daily from unavailable_times";
             $result = $conn->query($sql);
             $unavailable_times = [];
             if ($result->num_rows > 0) {
@@ -251,16 +251,14 @@
                   <?php foreach ($unavailable_times as $time): ?>
 
                     <option value="<?php echo $time['times_id']; ?>">
-                      <?php echo $time['date'] . " | " . substr($time['start_time'],0,5) . " - " . substr($time['end_time'],0,5); ?>
-                      <?php echo $time['repeat_weekly'] ? " (Repeats Weekly)" : ""; ?></option>
+                      <?php echo $time["date"] . " | " . substr($time["start_time"],0,5) . " - " . substr($time['end_time'],0,5); ?>
+                      <?php echo $time["repeat_daily"] ? " (Repeats Daily)" : ""; ?></option>
 
                   <?php endforeach; ?>
                 </select>
                 <button type="submit" class = "btn btn-primary form-control">Remove Selected Unavailable Time</button>
 
               </form>
-
-
 
             <?php endif; ?>
 

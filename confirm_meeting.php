@@ -2,9 +2,12 @@
 
         <?php 
             session_start();
+            if (empty($_SESSION["name"])) {
+                header("Location: meetings.php");
+                exit;
+            }
             require_once("connect.php");
             $meeting_id = (int) $_GET["id"];
-            echo $meeting_id;
             $stmt = $conn->prepare("UPDATE meetings SET status = 'confirmed' WHERE meeting_id = ?");
             $stmt->bind_param("i", $meeting_id);
             $stmt->execute();

@@ -61,13 +61,13 @@ if ($_SESSION["role"] === "client") {
             <hr>
             <div class="d-flex w-100 gap-2">
               <?php if ($_SESSION["role"] === "admin") {
-                echo '<button class="btn btn-success flex-fill" data-bs-toggle="modal" data-bs-target="#confirmMeeting">Confirm</button>';
+                echo '<button class="btn btn-success flex-fill" data-bs-toggle="modal" data-bs-target="#confirmMeeting' . $row['meeting_id'] . '">Confirm</button>';
               }?>
               <button class="btn btn-warning flex-fill" data-bs-toggle="modal" data-bs-target="#editMeetingForm<?= $row['meeting_id'] ?>">Edit</button>
               <button class="btn btn-danger flex-fill" data-bs-toggle="modal" data-bs-target="#deleteMeeting<?= $row['meeting_id'] ?>">Delete</button>
             </div>
 
-          <div class="modal fade" id="confirmMeeting" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+          <div class="modal fade" id="confirmMeeting<?= $row['meeting_id'] ?>" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
           <div class="modal-dialog">
             <div class="modal-content">
               
@@ -150,4 +150,3 @@ if ($_SESSION["role"] === "client") {
     <p>No meetings found.</p>
   <?php endif; ?>
   </div>
-
