@@ -40,8 +40,10 @@
 
       $pendingCount = 0;
       $upcomingCount = 0;
+	$user_id = $_SESSION["user_id"];
 
-      $r1 = $conn->query("SELECT COUNT(*) AS c FROM meetings WHERE status='pending'");
+	if ($_SESSION["role"] === "admin" ) {
+	      $r1 = $conn->query("SELECT COUNT(*) AS c FROM meetings WHERE status='pending'");
       if ($r1) { $pendingCount = (int)$r1->fetch_assoc()["c"]; }
 
       $r2 = $conn->query("
@@ -51,6 +53,21 @@
         WHERE m.status IN ('confirmed')
       ");
       if ($r2) { $upcomingCount = (int)$r2->fetch_assoc()["c"]; }
+}	
+elseif ($_SESSION["role"] === "client") {
+	$r1 = $conn->query("SELECT COUNT(*) AS c FROM meetings WHERE status='pending' AND user_id = $user_id");
+  if ($r1) { $pendingCount = (int)$r1->fetch_assoc()["c"]; }
+  $r2 = $conn->query("
+    SELECT COUNT(*) AS c
+    FROM meetings m
+    JOIN meeting_times mt ON mt.meeting_id = m.meeting_id
+    WHERE m.status IN ('confirmed')
+	  AND m.user_id = $user_id
+  ");
+  if ($r2) { $upcomingCount = (int)$r2->fetch_assoc()["c"]; }
+}
+
+
       ?>
 
   <div class="container">

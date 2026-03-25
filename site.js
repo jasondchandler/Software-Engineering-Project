@@ -38,3 +38,16 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
     });
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const editModal = document.querySelector('.modal[data-edit-modal="true"]');
+    if (editModal) {
+        const modal = new bootstrap.Modal(editModal);
+        modal.show();
+
+        editModal.addEventListener("hidden.bs.modal", function () {
+            document.body.classList.remove("modal-open");
+            document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+        });
+    }
+});

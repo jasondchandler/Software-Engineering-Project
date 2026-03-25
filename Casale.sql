@@ -13,15 +13,35 @@ CREATE TABLE USERS (
     CONSTRAINT Unique_Email UNIQUE (email),
     CONSTRAINT Unique_Phone UNIQUE (phone),
     CONSTRAINT Check_Role CHECK 
-        (role IN ("client", "paralegal", "admin"))
+        (role IN ("client", "paralegal", "attorney"))
 );
+
+CREATE TABLE ROLE_PERMISSIONS (
+	rp_id int not null AUTO_INCREMENT,
+	permission_id int not null,
+	role varchar(20) not null,
+	CONSTRAINT Role_Permissions_PK PRIMARY KEY (rp_id)
+);
+
+CREATE TABLE PERMISSIONS (
+	permission_id int not null AUTO_INCREMENT,
+	name VARCHAR(75) not null,
+	CONSTRAINT Permission_PK PRIMARY KEY (permission_id)
+);
+
+/**************
+INSERT STATEMENTS FOR PERMISSIONS
+kebab case, lowercase, <75 chars
+**************/
+INSERT INTO PERMISSIONS ('view-meetings')
+
 
 CREATE TABLE MEETINGS (
   meeting_id int NOT NULL AUTO_INCREMENT,
   location varchar(255) NOT NULL DEFAULT "Zoom",
   duration int NOT NULL,           
   notes text NULL,
-  status enum('pending','confirmed','completed','cancelled','no_show') NOT NULL DEFAULT 'pending',
+  status enum('pending','confirmed','cancelled', 'no_show', 'complete') NOT NULL DEFAULT 'pending',
   user_id int NOT NULL,
   created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

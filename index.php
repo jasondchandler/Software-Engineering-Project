@@ -29,7 +29,7 @@
         <div id="main" class = "main">
 
             <div class = "container">
-                <h2> Content </h2>
+                <h2> Content</h2>
                 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae ipsa neque quibusdam eius debitis ut deleniti dolores, incidunt, rerum exercitationem tempora nobis explicabo obcaecati, laborum blanditiis. Unde dolorum veritatis architecto!
                 </p>
 

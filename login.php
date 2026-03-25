@@ -49,6 +49,7 @@ session_start();
     <p>No account? <a href="signup.php">Click here to sign up.</a></p>
   </form>
 </div>
+<br><br><br>
 
 </body>
 </html>

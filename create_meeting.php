@@ -34,14 +34,12 @@
     $buffered_end = $buffered_end->format("Y-m-d H:i:s");
 
     // check for times that are already booked
-    $sql = "
-        select count(*) AS time_conflicts
+    $sql = "select count(*) AS time_conflicts
         from meeting_times mt
         join meetings m ON m.meeting_id = mt.meeting_id
         where m.status != 'cancelled'
         and (
-        mt.start_time < ? AND mt.end_time > ?
-        )";
+        mt.start_time < ? AND mt.end_time > ?)";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ss", $buffered_end, $buffered_start);
         $stmt->execute();

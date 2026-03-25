@@ -2,6 +2,7 @@
 require_once("connect.php");
 session_start();
 
+
 // Get form data
 $email = $_POST["email"];
 $password = $_POST["password"];
@@ -24,7 +25,7 @@ if ($password !== $password_confirm) {
 
 // Check if email is unique
 $stmt = $conn->prepare("select email from users where email = ?");
-$stmt->bind_param("i", $email);
+$stmt->bind_param("s", $email);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -34,7 +35,7 @@ if ($result->num_rows > 0) {
 
 // Check if phone is unique
 $stmt = $conn->prepare("select phone from users where phone = ?");
-$stmt->bind_param("i", $phone);
+$stmt->bind_param("s", $phone);
 $stmt->execute();
 $result = $stmt->get_result();
 

@@ -25,6 +25,7 @@ if ($row && password_verify($password, $row["password"])) {
 } else {
         $_SESSION["login_error"] = "Invalid login. Please try again.";
         header("Location: login.php");
+        exit;
    }
 
 ?>

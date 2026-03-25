@@ -74,6 +74,7 @@
         <p><a href="index.php">Click here to return to home page.</a></p>
   </form>
 </div>  
+<br><br><br>
 
   </body>
 
