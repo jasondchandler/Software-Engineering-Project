@@ -43,6 +43,12 @@
 
         <a class="<?php echo ($current == "") ? "active" : ""; ?>" href = "meetings.php">Meetings</a>
 
+	<a class="<?php echo ($current == "") ? "active" : ""; ?>" href = "cases.php">Cases</a>
+
+	<a class="<?php echo ($current == "") ? "active" : ""; ?>" href = "tasks.php">Tasks</a>
+
+	<a class="<?php echo ($current == "") ? "active" : ""; ?>" href = "documents.php">Documents</a>
+
 
         <script src = "https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
         <script src = "site.js" defer></script>
