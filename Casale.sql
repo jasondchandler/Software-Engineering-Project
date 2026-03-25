@@ -13,7 +13,7 @@ CREATE TABLE USERS (
     CONSTRAINT Unique_Email UNIQUE (email),
     CONSTRAINT Unique_Phone UNIQUE (phone),
     CONSTRAINT Check_Role CHECK 
-        (role IN ("client", "paralegal", "attorney"))
+        (role IN ("client", "paralegal", "admin"))
 );
 
 CREATE TABLE ROLE_PERMISSIONS (
