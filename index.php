@@ -30,7 +30,7 @@
 
             <div class = "container">
                 <h2> Content</h2>
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae ipsa neque quibusdam eius debitis ut deleniti dolores, incidunt, rerum exercitationem tempora nobis explicabo obcaecati, laborum blanditiis. Unde dolorum veritatis architecto!
+                <p><?php var_dump($_SESSION);?>
                 </p>
 
                 <br><br>

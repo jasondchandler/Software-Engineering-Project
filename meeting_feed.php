@@ -5,7 +5,9 @@
               echo htmlspecialchars($_SESSION["edit_meeting_error"]);
               echo "</div>";
           }
-            
+		
+	include 'role_function.php';            
+
             ?>
 
 <form method="GET" action="">
@@ -108,7 +110,7 @@ elseif ($_SESSION["role"] === "admin") {
               <?php 
 
 
-              if ($_SESSION["role"] === "admin" && $row["status"] === "pending") {
+              if (allow("confirm-meetings") && $row["status"] === "pending") {
                 echo '<button class="btn btn-success flex-fill" data-bs-toggle="modal" data-bs-target="#confirmMeeting' . $row['meeting_id'] . '">Confirm</button>';
                 echo "<br>";
               }

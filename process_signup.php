@@ -78,6 +78,19 @@ if ($stmt->execute()) {
         $_SESSION["role"] = "client";
     }
 
+	$sql = "SELECT name FROM PERMISSIONS WHERE role = ? OR role = 'all'";
+
+	$stmt = $conn->prepare($sql);
+	$stmt->bind_param("s", $_SESSION["role"]);
+	$stmt->execute();
+
+	$result = $stmt->get_result();
+	$permissions = [];
+while ($row = $result->fetch_assoc()) {
+    $permissions[] = $row['name'];
+}
+
+$_SESSION["permissions"] = $permissions;
     
 
     header("Location: index.php");

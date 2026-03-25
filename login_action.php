@@ -20,6 +20,20 @@ if ($row && password_verify($password, $row["password"])) {
     } else {
         $_SESSION["role"] = "client";
     }
+
+	$sql = "SELECT name FROM PERMISSIONS WHERE role = ?";
+
+	$stmt = $conn->prepare($sql);
+	$stmt->bind_param("s", $_SESSION["role"]);
+	$stmt->execute();
+
+	$result = $stmt->get_result();
+	$permissions = [];
+while ($row = $result->fetch_assoc()) {
+    $permissions[] = $row['name'];
+}
+
+$_SESSION["permissions"] = $permissions;
     header("Location: index.php");
     exit;
 } else {

@@ -26,6 +26,7 @@ CREATE TABLE ROLE_PERMISSIONS (
 CREATE TABLE PERMISSIONS (
 	permission_id int not null AUTO_INCREMENT,
 	name VARCHAR(75) not null,
+	role varchar(20) not null,
 	CONSTRAINT Permission_PK PRIMARY KEY (permission_id)
 );
 
@@ -33,7 +34,9 @@ CREATE TABLE PERMISSIONS (
 INSERT STATEMENTS FOR PERMISSIONS
 kebab case, lowercase, <75 chars
 **************/
-INSERT INTO PERMISSIONS ('view-meetings')
+INSERT INTO PERMISSIONS (name, role) VALUES ('view-meetings', 'client');
+INSERT INTO PERMISSIONS (name, role) VALUES ('view-meetings', 'admin');
+INSERT INTO PERMISSIONS (name, role) VALUES ('confirm-meetings', 'admin');
 
 
 CREATE TABLE MEETINGS (
