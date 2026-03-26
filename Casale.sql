@@ -82,6 +82,13 @@ CREATE TABLE UNAVAILABLE_TIMES (
     CONSTRAINT Times_PK Primary Key (times_id)
 );
  
-
+CREATE TABLE case_fee (
+    fee_id INT AUTO_INCREMENT PRIMARY KEY,
+    case_id INT NOT NULL,
+    fee_type VARCHAR(50),
+    amount DECIMAL(10,2) NOT NULL,
+    date_charged DATE,
+    FOREIGN KEY (case_id) REFERENCES cases(id)
+);
 
 
