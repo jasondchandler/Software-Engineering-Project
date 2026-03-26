@@ -91,4 +91,13 @@ CREATE TABLE case_fee (
     FOREIGN KEY (case_id) REFERENCES cases(id)
 );
 
+CREATE TABLE case_hours (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    case_id INT NOT NULL,
+    work_date DATE NOT NULL,
+    hours DECIMAL(4,2) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
+    FOREIGN KEY (case_id) REFERENCES cases(id)
+);
