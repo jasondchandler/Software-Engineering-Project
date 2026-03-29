@@ -38,7 +38,6 @@ body {
 .link li {
     height: 40px;
     width: auto;
-    background-color: transparent;
     border-radius: 16px;
     justify-content: center; 
     text-align:center; 
@@ -71,6 +70,7 @@ body {
 .link li a .active {
     color: black;
     text-decoration-color: black; 
+	background-color: #343a40;
 }
 
 .sidebar {
@@ -91,14 +91,16 @@ body {
     text-decoration: none;
 }
 
-.sidebar a.active {
+.sidebar a .active {
     color: #fff;
+background-color: #343a40;
 }
 
 .sidebar a:hover:not(.active) {
     color: #fff;
     background-color: #343a40;
 }
+
 
 .closed {
     margin-left: -200px;

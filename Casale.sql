@@ -85,7 +85,8 @@ CREATE TABLE UNAVAILABLE_TIMES (
 CREATE TABLE case_fee (
     fee_id INT AUTO_INCREMENT PRIMARY KEY,
     case_id INT NOT NULL,
-    fee_type VARCHAR(50),
+    fee_type VARCHAR(50) not null,
+	description varchar(200) null, 
     amount DECIMAL(10,2) NOT NULL,
     date_charged DATE,
     FOREIGN KEY (case_id) REFERENCES cases(id)
@@ -96,8 +97,34 @@ CREATE TABLE case_hours (
     case_id INT NOT NULL,
     work_date DATE NOT NULL,
     hours DECIMAL(4,2) NOT NULL,
-    description TEXT,
+    description varchar(250) not null,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (case_id) REFERENCES cases(id)
+);
+
+CREATE TABLE CASE_USERS (
+    user_id int not null,
+    case_id int not null,
+    CONSTRAINT CU_PK PRIMARY KEY (user_id, case_id),
+    CONSTRAINT User_FK FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    CONSTRAINT User_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
+);
+
+
+CREATE TABLE CASE_RETAINERS (
+    case_id int not null,
+	value int not null,
+    CONSTRAINT CR_PK PRIMARY KEY (case_id),
+    CONSTRAINT User_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
+);
+
+CREATE TABLE DOCUMENTS (
+    document_id int not null AUTO_INCREMENT,
+	case_id int null,
+	name varchar(200) not null,
+	description varchar(250) null,
+	path varchar(200) not null, 
+    CONSTRAINT CU_PK PRIMARY KEY (document_id),
+    CONSTRAINT User_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
 );

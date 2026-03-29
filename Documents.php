@@ -38,6 +38,62 @@
 
       function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
-	?>
+
+
+
+
+	if (isset($_SESSION["document_error"])) {
+		echo $_SESSION["document_error"];
+		unset($_SESSION["document_error"]);
+
+ } ?>
+
+
+	<button class="btn btn-dark flex-fill" data-bs-toggle="modal" data-bs-target="#uploadDocument">Upload Document</button>
+	
+	<div class="modal fade" id="uploadDocument" tabindex="-1" aria-labelledby="u" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    
+                    <div class="modal-header">
+                      <h5 class="modal-title">Upload Document</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                      <form action="document_upload_action.php" method="POST" enctype= "multipart/form-data">
+          <input type="hidden" name="meeting_id" value="<?= $row['meeting_id']; ?>">
+
+          <?php
+          if (!empty($_SESSION["document_upload_error"])) {
+              echo '<div class="alert alert-danger text-center" role="alert">';
+              echo htmlspecialchars($_SESSION["document_upload_error"]);
+              echo "</div>";
+          }
+          ?>
+
+          <label class="form-label">Name:</label>
+          <input type="text" class="form-control mb-3" name="name" required>
+
+          <label class="form-label">Select file:</label>
+          <input type="file" class="form-control mb-3" name="file" required>
+
+	  <label class="form-label">Describe the file:</label>
+          <input type="text" class="form-control mb-3" name="description">
+
+	  <button type="submit" class="form-control btn btn-success">Submit</button>
+        </form>
+                    </div>
+                    
+                    <div class="modal-footer">
+                
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+
+
 </div>
 </body>
