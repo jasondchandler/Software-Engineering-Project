@@ -128,3 +128,12 @@ CREATE TABLE DOCUMENTS (
     CONSTRAINT CU_PK PRIMARY KEY (document_id),
     CONSTRAINT User_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
 );
+SELECT case_id, 'hour logged' AS type, hours AS value, work_date AS activity_date
+FROM case_hours
+
+UNION ALL
+
+SELECT case_id, 'fee added' AS type, amount AS value, date_charged AS activity_date
+FROM case_fee
+
+ORDER BY activity_date DESC;
