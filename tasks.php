@@ -28,6 +28,14 @@
 
 
   <div class = "main">
+
+    <div class="nav">
+      <div>
+        <h1>Task Dashboard</h1>
+        <div class="small">Welcome back, <?php echo $_SESSION["name"]; ?></div>
+      </div>
+    </div>
+
       <?php
 
       if (empty($_SESSION["user_id"])) {

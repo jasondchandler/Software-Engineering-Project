@@ -16,13 +16,6 @@ CREATE TABLE USERS (
         (role IN ("client", "paralegal", "admin"))
 );
 
-CREATE TABLE ROLE_PERMISSIONS (
-	rp_id int not null AUTO_INCREMENT,
-	permission_id int not null,
-	role varchar(20) not null,
-	CONSTRAINT Role_Permissions_PK PRIMARY KEY (rp_id)
-);
-
 CREATE TABLE PERMISSIONS (
 	permission_id int not null AUTO_INCREMENT,
 	name VARCHAR(75) not null,
@@ -51,7 +44,10 @@ kebab case, lowercase, <75 chars
 **************/
 INSERT INTO PERMISSIONS (name, role) VALUES ('view-meetings', 'client');
 INSERT INTO PERMISSIONS (name, role) VALUES ('view-meetings', 'admin');
-INSERT INTO PERMISSIONS (name, role) VALUES ('confirm-meetings', 'admin');
+INSERT INTO PERMISSIONS (name, role) VALUES ('view-meetings', 'paralegal');
+INSERT INTO PERMISSIONS (name, role) VALUES ('change-meeting-status', 'admin');
+INSERT INTO PERMISSIONS (name, role) VALUES ('view-users', 'admin');
+INSERT INTO PERMISSIONS (name, role) VALUES ('set-times', 'admin');
 
 
 CREATE TABLE MEETINGS (
@@ -143,6 +139,24 @@ CREATE TABLE DOCUMENTS (
     CONSTRAINT CU_PK PRIMARY KEY (document_id),
     CONSTRAINT User_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
 );
+
+/**************
+Run this to give an account admin role
+change the where clause as needed
+**************/
+UPDATE users SET role = 'admin' WHERE user_id = 1;
+
+
+
+
+
+
+
+
+
+
+
+
 SELECT case_id, 'hour logged' AS type, hours AS value, work_date AS activity_date
 FROM case_hours
 
@@ -152,3 +166,6 @@ SELECT case_id, 'fee added' AS type, amount AS value, date_charged AS activity_d
 FROM case_fee
 
 ORDER BY activity_date DESC;
+
+
+

@@ -49,6 +49,8 @@
 
 	<a class="<?php echo ($current == "") ? "active" : ""; ?>" href = "documents.php">Documents</a>
 
+    <a class="<?php echo ($current == "") ? "active" : ""; ?>" href = "users.php">Users</a>
+
 
         <script src = "https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
         <script src = "site.js" defer></script>
