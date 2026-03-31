@@ -1,0 +1,122 @@
+<?php
+session_start();
+include 'db.php';   
+include 'role_function.php';
+?>
+
+<?php 
+
+include 'role_function.php';
+
+if ($_SESSION["role"] === "client") {
+    $sql = "SELECT * FROM cases WHERE user_id = ? ORDER BY created_at DESC";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $_SESSION["user_id"]);
+    $stmt->execute();
+    $result = $stmt->get_result();
+} 
+else {
+    $sql = "SELECT * FROM cases ORDER BY created_at DESC";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
+}
+?>
+
+<?php $count=1; if ($result && $result->num_rows > 0): ?>
+
+  <?php while ($row = $result->fetch_assoc()): ?>
+
+```
+<div class="case">
+    <span>Case #<?php echo $count; ?></span><br>
+
+    <span><strong>Case Name:</strong> <?php echo htmlspecialchars($row["case_name"]); ?></span><br>
+
+    <span><strong>Description:</strong> 
+    <?php 
+        if (!empty($row["description"])) {
+            echo htmlspecialchars($row["description"]);
+        } else {
+            echo "None";
+        }
+    ?>
+    </span><br>
+
+    <span><strong>Date Created:</strong> <?php echo $row["created_at"]; ?></span><br>
+
+    <hr>
+
+    <div class="d-flex flex-wrap gap-2">
+        <?php 
+        if ($_SESSION["role"] === "attorney") {
+            echo '<button class="btn btn-warning flex-fill" data-bs-toggle="modal" data-bs-target="#editCaseForm' . $row['id'] . '">Edit</button>
+                  <button class="btn btn-danger flex-fill" data-bs-toggle="modal" data-bs-target="#deleteCase' . $row['id'] . '">Delete</button>';
+        }
+        ?>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div class="modal fade" id="editCaseForm<?= $row['id'] ?>" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Case</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body">
+            <form action="edit_case.php" method="POST">
+              <input type="hidden" name="case_id" value="<?= $row['id']; ?>">
+
+              <label class="form-label">Case Name:</label>
+              <input type="text" class="form-control mb-3" name="case_name" 
+                     value="<?= htmlspecialchars($row['case_name']); ?>" required>
+
+              <label class="form-label">Description:</label>
+              <textarea name="description" class="form-control mb-3"><?= htmlspecialchars($row["description"]); ?></textarea>
+
+              <button type="submit" class="btn btn-dark form-control">Update Case</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DELETE MODAL -->
+    <div class="modal fade" id="deleteCase<?= $row['id']?>" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          
+          <div class="modal-header">
+            <h5 class="modal-title">Delete Case</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body">
+            Are you sure you want to delete this case?
+          </div>
+          
+          <div class="modal-footer">
+            <form action="delete_case.php" method="POST">
+              <input type="hidden" name="case_id" value="<?= $row['id'] ?>">
+              <button type="submit" class="btn btn-success">Yes</button>
+            </form>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+</div>
+<?php $count++; ?>
+```
+
+  <?php endwhile; ?>
+
+<?php else: ?>
+
+  <p>No cases found.</p>
+<?php endif; ?>
