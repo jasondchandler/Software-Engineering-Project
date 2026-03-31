@@ -104,14 +104,13 @@ CREATE TABLE case_fee (
 );
 
 CREATE TABLE case_hours (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    hours_id INT AUTO_INCREMENT PRIMARY KEY,
     case_id INT NOT NULL,
     work_date DATE NOT NULL,
     hours DECIMAL(4,2) NOT NULL,
     description varchar(250) not null,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    FOREIGN KEY (case_id) REFERENCES cases(id)
+    CONSTRAINT FOREIGN KEY (case_id) REFERENCES Cases(case_id)
 );
 
 CREATE TABLE CASE_USERS (
