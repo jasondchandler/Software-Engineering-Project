@@ -100,7 +100,7 @@ CREATE TABLE case_fee (
 	description varchar(200) null, 
     amount DECIMAL(10,2) NOT NULL,
     date_charged DATE,
-    FOREIGN KEY (case_id) REFERENCES cases(id)
+    CONSTRAINT CF_Case_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
 );
 
 CREATE TABLE case_hours (
@@ -110,15 +110,15 @@ CREATE TABLE case_hours (
     hours DECIMAL(4,2) NOT NULL,
     description varchar(250) not null,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT FOREIGN KEY (case_id) REFERENCES Cases(case_id)
+    CONSTRAINT CH_Case_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
 );
 
 CREATE TABLE CASE_USERS (
     user_id int not null,
     case_id int not null,
     CONSTRAINT CU_PK PRIMARY KEY (user_id, case_id),
-    CONSTRAINT User_FK FOREIGN KEY (user_id) REFERENCES Users(user_id),
-    CONSTRAINT User_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
+    CONSTRAINT CU_User_FK FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    CONSTRAINT CU_Case_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
 );
 
 
@@ -126,7 +126,7 @@ CREATE TABLE CASE_RETAINERS (
     case_id int not null,
 	value int not null,
     CONSTRAINT CR_PK PRIMARY KEY (case_id),
-    CONSTRAINT User_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
+    CONSTRAINT CR_User_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
 );
 
 CREATE TABLE DOCUMENTS (
@@ -136,7 +136,7 @@ CREATE TABLE DOCUMENTS (
 	description varchar(250) null,
 	path varchar(200) not null, 
     CONSTRAINT CU_PK PRIMARY KEY (document_id),
-    CONSTRAINT User_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
+    CONSTRAINT CU_User_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
 );
 
 /**************
