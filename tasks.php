@@ -103,6 +103,53 @@
             	</div>
         	</div>
     	<?php endif; ?>
+		<hr>
+		<h2>Your Tasks</h2>
+
+		<?php
+		if ($_SESSION["role"] === "admin") {
+    		$sql = "SELECT t.task_id, t.description, t.can_complete_digitally, t.status, t.created_at,
+                   u.firstname, u.lastname, u.email, u.role
+            		FROM TASKS t
+            		JOIN USERS u ON t.user_id = u.user_id
+            		ORDER BY t.created_at DESC";
+    		$stmt = $conn->prepare($sql);
+    		$stmt->execute();
+		} else {
+    		$sql = "SELECT task_id, description, can_complete_digitally, status, created_at
+            		FROM TASKS
+            		WHERE user_id = ?
+            		ORDER BY created_at DESC";
+    		$stmt = $conn->prepare($sql);
+    		$stmt->bind_param("i", $_SESSION["user_id"]);
+    		$stmt->execute();
+		}
+
+		$result = $stmt->get_result();
+
+		if ($result->num_rows > 0) {
+    		while ($row = $result->fetch_assoc()) {
+        		echo '<div class="meeting">';
+        		echo '<strong>Task #' . htmlspecialchars($row["task_id"]) . '</strong><br>';
+        		echo 'Description: ' . htmlspecialchars($row["description"]) . '<br>';
+        		echo 'Status: ' . htmlspecialchars($row["status"]) . '<br>';
+        		echo 'Digital Completion: ' . ($row["can_complete_digitally"] ? 'Yes' : 'No') . '<br>';
+        		echo 'Created: ' . htmlspecialchars($row["created_at"]) . '<br>';
+
+        		if ($_SESSION["role"] === "admin") {
+            		echo 'Assigned To: '
+                		. htmlspecialchars($row["firstname"] . ' ' . $row["lastname"] . ' | ' . $row["email"] . ' | ' . $row["role"])
+                		. '<br>';
+        		}
+
+        		echo '</div>';
+    		}
+		} else {
+    		echo "<p>No tasks found.</p>";
+		}
+
+		$stmt->close();
+		?>
     <div class="nav">
       <div>
         <h1>Task Dashboard</h1>
