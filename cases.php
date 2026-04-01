@@ -46,7 +46,61 @@
         <div class="small">Welcome back, <?php echo $_SESSION["name"]; ?></div>
       </div>
     </div>
+	  <?php
+$pendingCount = 0;
+$ongoingCount = 0;
+$closedCount = 0;
+$user_id = $_SESSION["user_id"];
 
+if ($_SESSION["role"] === "admin") {
+    $r1 = $conn->query("SELECT COUNT(*) AS c FROM cases WHERE status='pending'");
+    $pendingCount = $r1 ? (int)$r1->fetch_assoc()["c"] : 0;
+
+    $r2 = $conn->query("SELECT COUNT(*) AS c FROM cases WHERE status='ongoing'");
+    $ongoingCount = $r2 ? (int)$r2->fetch_assoc()["c"] : 0;
+
+    $r3 = $conn->query("SELECT COUNT(*) AS c FROM cases WHERE status='closed'");
+    $closedCount = $r3 ? (int)$r3->fetch_assoc()["c"] : 0;
+} 
+elseif ($_SESSION["role"] === "attorney" || $_SESSION["role"] === "staff") {
+    $r1 = $conn->query("SELECT COUNT(*) AS c FROM cases WHERE status='pending' AND assigned_to=$user_id");
+    $pendingCount = $r1 ? (int)$r1->fetch_assoc()["c"] : 0;
+
+    $r2 = $conn->query("SELECT COUNT(*) AS c FROM cases WHERE status='ongoing' AND assigned_to=$user_id");
+    $ongoingCount = $r2 ? (int)$r2->fetch_assoc()["c"] : 0;
+
+    $r3 = $conn->query("SELECT COUNT(*) AS c FROM cases WHERE status='closed' AND assigned_to=$user_id");
+    $closedCount = $r3 ? (int)$r3->fetch_assoc()["c"] : 0;
+}
+?>
+
+<div class="container">
+    <div class="nav">
+        <div>
+            <h1>Case Dashboard</h1>
+            <div class="small">Welcome back, <?php echo h($_SESSION["name"]); ?></div>
+        </div>
+    </div>
+
+    <div class="stats">
+        <div class="stat">
+            <div class="small">Pending Cases</div>
+            <div class="num"><?php echo $pendingCount; ?></div>
+            <div class="small">Awaiting review</div>
+        </div>
+
+        <div class="stat">
+            <div class="small">Ongoing Cases</div>
+            <div class="num"><?php echo $ongoingCount; ?></div>
+            <div class="small">In progress</div>
+        </div>
+
+        <div class="stat">
+            <div class="small">Closed Cases</div>
+            <div class="num"><?php echo $closedCount; ?></div>
+            <div class="small">Completed</div>
+        </div>
+    </div>
     <button type="button" class="btn btn-dark w-100 mt-3 mb-3" data-bs-toggle="modal" data-bs-target="#createCaseForm"> 
       Create Case
     </button>
