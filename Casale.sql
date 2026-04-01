@@ -137,8 +137,8 @@ CREATE TABLE DOCUMENTS (
 	name varchar(200) not null,
 	description varchar(250) null,
 	path varchar(200) not null, 
-    CONSTRAINT CU_PK PRIMARY KEY (document_id),
-    CONSTRAINT CU_User_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
+    CONSTRAINT D_PK PRIMARY KEY (document_id),
+    CONSTRAINT D_Case_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
 );
 
 /**************
