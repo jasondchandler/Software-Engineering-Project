@@ -28,7 +28,81 @@
 
 
   <div class = "main">
+	<div class="container">
+    	<div class="nav">
+        	<div>
+            	<h1>Task Dashboard</h1>
+            	<div class="small">Welcome back, <?php echo $_SESSION["name"]; ?></div>
+        	</div>
+    	</div>
 
+    	<?php
+    	if (!empty($_SESSION["task_error"])) {
+        	echo '<div class="alert alert-danger text-center" role="alert">';
+        	echo htmlspecialchars($_SESSION["task_error"]);
+        	echo '</div>';
+        	unset($_SESSION["task_error"]);
+    	}
+
+    	if (!empty($_SESSION["task_success"])) {
+        	echo '<div class="alert alert-success text-center" role="alert">';
+        	echo htmlspecialchars($_SESSION["task_success"]);
+        	echo '</div>';
+        	unset($_SESSION["task_success"]);
+    	}
+    	?>
+
+    	<?php if ($_SESSION["role"] === "admin"): ?>
+        	<button type="button" class="btn btn-dark w-100 mt-3 mb-3" data-bs-toggle="modal" data-bs-target="#assignTaskForm">
+            	Assign Task
+        	</button>
+
+        	<div class="modal fade" id="assignTaskForm" tabindex="-1" aria-hidden="true">
+            	<div class="modal-dialog">
+                	<div class="modal-content">
+
+                    	<div class="modal-header">
+                        	<h5 class="modal-title">Assign Task</h5>
+                        	<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    	</div>
+
+                    	<div class="modal-body">
+                        	<form action="create_task.php" method="POST">
+
+                            	<div class="mb-3">
+                                	<label class="form-label">Assign To:</label>
+                                	<select name="user_id" class="form-control" required>
+                                    	<?php
+                                    	$result = $conn->query("SELECT user_id, firstname, lastname, email, role FROM users WHERE role IN ('client', 'paralegal')");
+                                    	while ($row = $result->fetch_assoc()) {
+                                        	echo '<option value="' . $row["user_id"] . '">'
+                                            	. htmlspecialchars($row["firstname"] . ' ' . $row["lastname"] . ' | ' . $row["email"] . ' | ' . $row["role"])
+                                            	. '</option>';
+                                    	}
+                                    	?>
+                                	</select>
+                            	</div>
+
+                            	<div class="mb-3">
+                                	<label class="form-label">Task Description:</label>
+                                	<textarea name="description" class="form-control" required></textarea>
+                            	</div>
+
+                            	<div class="mb-3 form-check">
+                                	<input type="checkbox" class="form-check-input" id="digital" name="can_complete_digitally" value="1">
+                                	<label class="form-check-label" for="digital">
+                                    	Can be completed digitally
+                                	</label>
+                            	</div>
+
+                            	<button type="submit" class="btn btn-primary form-control">Assign Task</button>
+                        	</form>
+                    	</div>
+
+                	</div>
+            	</div>
+        	</div>
+    	<?php endif; ?>
     <div class="nav">
       <div>
         <h1>Task Dashboard</h1>
