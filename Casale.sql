@@ -168,5 +168,5 @@ FROM case_fee
 
 ORDER BY activity_date DESC;
 
-
+ALTER TABLE cases ADD COLUMN assigned_to INT NULL;
 
