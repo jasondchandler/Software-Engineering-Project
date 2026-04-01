@@ -26,15 +26,14 @@ CREATE TABLE PERMISSIONS (
 CREATE TABLE TASKS (
     task_id INT NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
-    title VARCHAR(100) NOT NULL,
-    description VARCHAR(250) NULL,
+    description VARCHAR(250) NOT NULL,
+    can_complete_digitally BOOLEAN NOT NULL DEFAULT FALSE,
     status VARCHAR(20) NOT NULL DEFAULT 'Pending',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    due_date DATE NULL,
     CONSTRAINT Task_PK PRIMARY KEY (task_id),
     CONSTRAINT Task_User_FK FOREIGN KEY (user_id) REFERENCES USERS(user_id),
     CONSTRAINT Task_Status_Check CHECK (
-        status IN ('Pending', 'In Progress', 'Completed')
+        status IN ('Pending', 'Completed')
     )
 );
 
