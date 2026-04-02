@@ -36,6 +36,34 @@
                 <br><br>
             </div>
 
+            <div class = "container d-flex justify-content-center mb-5">
+                <div class="row d-flex justify-content-center">
+                    <div class="col-4 d-flex justify-content-center columns m-2">
+                        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Tenetur temporibus qui dignissimos voluptatum, laboriosam laborum magni quibusdam fugit odio quidem ducimus! Quae iste ab maiores quas ratione quisquam repudiandae reprehenderit.
+                    </div>
+                    <div class="col-4 d-flex justify-content-center columns m-2">
+                        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Neque a quia ratione similique molestias? Enim ratione mollitia ipsam, quo cumque odio distinctio adipisci ducimus placeat et libero, sint, hic reprehenderit?
+                    </div>
+                    <div class="col-4 d-flex justify-content-center columns m-2">
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Fuga amet, quas quis esse nostrum eligendi qui nemo exercitationem ut eum minima tenetur voluptatibus impedit iusto debitis vel delectus temporibus alias.
+                    </div>
+                </div>
+            </div>
+
+            <div class="info1">
+
+            <h1>Content Class #1</h1>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ea minima fuga explicabo neque labore, consequatur est optio mollitia consectetur ipsum esse! Maiores a nihil eius repellendus. Rerum totam sapiente aliquid.</p>
+
+            </div>
+
+            <div class="info2">
+
+            <h1>Content Class #2</h1>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ea minima fuga explicabo neque labore, consequatur est optio mollitia consectetur ipsum esse! Maiores a nihil eius repellendus. Rerum totam sapiente aliquid.</p>
+
+            </div>
+
         </div>
 
     </body>

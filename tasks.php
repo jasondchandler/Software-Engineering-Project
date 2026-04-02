@@ -100,11 +100,11 @@ $taskCount = 0;
 
  <div class="search_container"> 
     <form class="mb-3" method="GET">
-      <input class="form-control mb-2"type=text name="search">
-      <button class="btn btn-dark w-100">Search</button>
+      <input class="form-control mb-3"type=text name="search" placeholder="Enter search term...">
+      <button class="btn btn-primary w-100">Search</button>
     </form>
 
-    <a class="btn btn-dark w-100"href="<?= strtok($_SERVER['REQUEST_URI'], '?'); ?>" class="btn btn-secondary">Clear Search</a>
+    <a class="btn btn-primary w-100"href="<?= strtok($_SERVER['REQUEST_URI'], '?'); ?>">Clear Search</a>
 
     <?php 
       $search = $_GET["search"] ?? "";
@@ -166,7 +166,7 @@ $taskCount = 0;
         </div>
     <?php endif; ?>
 
-    <br><br>
+    <hr><br><br>
     <h1>Your Tasks:</h1>
 
     <?php

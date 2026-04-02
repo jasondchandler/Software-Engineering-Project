@@ -153,6 +153,34 @@ elseif ($_SESSION["role"] === "attorney" || $_SESSION["role"] === "staff") {
     </div>
   </div>
 </div>
+<hr><br><br>
+<h1>Your cases:</h1>
 
+<div class="search_container">
+<form method="GET" action="">
+        <label>
+            <input type="checkbox" name="type" value="1" <?php if(!empty($_GET['type'])) echo 'checked'; ?>> Hide Pending
+        </label>
+        <label>
+            <input type="checkbox" name="date" value="1" <?php if(!empty($_GET['date'])) echo 'checked'; ?>> Hide No-Show
+        </label>
+        <button type="submit" class="btn btn-primary w-100 mt-2">Apply Filter</button>
+    </form>
+        </div>
 </div>
+
+<?php 
+$sql ="";
+if (!empty($_GET['type'])) {
+  $orderBY = $_GET['type'];
+
+  $sql = $sql . " ORDER BY $orderBy";
+}
+
+if (!empty($_GET['date'])) {
+
+  $sql = $sql . " SORT BY filing_date";
+}
+
+?>
 </body>

@@ -287,7 +287,7 @@ elseif ($_SESSION["role"] === "client") {
 
 
 
-<br><br>
+<hr><br><br>
         <h1>Your meetings: </h1>
 
 	<?php include "meeting_feed.php"?>

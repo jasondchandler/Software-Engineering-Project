@@ -41,15 +41,15 @@
 
     <div id="sidebar" class="sidebar">
 
-        <a class="<?php echo ($current == "") ? "active" : ""; ?>" href = "meetings.php">Meetings</a>
+        <a class="<?php echo ($current == "meetings.php") ? "active" : ""; ?>" href = "meetings.php">Meetings</a>
 
-	<a class="<?php echo ($current == "") ? "active" : ""; ?>" href = "cases.php">Cases</a>
+	<a class="<?php echo ($current == "cases.php") ? "active" : ""; ?>" href = "cases.php">Cases</a>
 
-	<a class="<?php echo ($current == "") ? "active" : ""; ?>" href = "tasks.php">Tasks</a>
+	<a class="<?php echo ($current == "tasks.php") ? "active" : ""; ?>" href = "tasks.php">Tasks</a>
 
-	<a class="<?php echo ($current == "") ? "active" : ""; ?>" href = "documents.php">Documents</a>
+	<a class="<?php echo ($current == "Documents.php") ? "active" : ""; ?>" href = "Documents.php">Documents</a>
 
-    <a class="<?php echo ($current == "") ? "active" : ""; ?>" href = "users.php">Users</a>
+    <a class="<?php echo ($current == "users.php") ? "active" : ""; ?>" href = "users.php">Users</a>
 
 
         <script src = "https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
