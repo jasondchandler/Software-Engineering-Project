@@ -12,7 +12,7 @@ $task_id = (int) $_POST["task_id"];
 $user_id = (int) $_SESSION["user_id"];
 $completion_notes = trim($_POST["completion_notes"]);
 
-// get task
+
 $stmt = $conn->prepare("SELECT user_id, can_complete_digitally, status FROM tasks WHERE task_id = ?");
 $stmt->bind_param("i", $task_id);
 $stmt->execute();
@@ -20,7 +20,7 @@ $result = $stmt->get_result();
 $task = $result->fetch_assoc();
 $stmt->close();
 
-// validations
+
 if (!$task) {
     $_SESSION["task_error"] = "Task not found.";
     header("Location: tasks.php");
@@ -45,7 +45,7 @@ if ($task["status"] === "Completed") {
     exit;
 }
 
-// allow notes OR file OR both
+
 $hasFile = isset($_FILES["completion_file"]) && $_FILES["completion_file"]["error"] === 0;
 $hasNotes = !empty($completion_notes);
 
@@ -55,7 +55,6 @@ if (!$hasFile && !$hasNotes) {
     exit;
 }
 
-// upload file if exists
 $fileName = NULL;
 
 if ($hasFile) {
@@ -79,14 +78,22 @@ if ($hasFile) {
         header("Location: tasks.php");
         exit;
     }
+
+    
+    $docName = $originalName;
+    $docDescription = "Task completion upload for task #" . $task_id;
+
+    $docStmt = $conn->prepare("INSERT INTO documents (case_id, name, description, path) VALUES (NULL, ?, ?, ?)");
+    $docStmt->bind_param("sss", $docName, $docDescription, $fileName);
+    $docStmt->execute();
+    $docStmt->close();
 }
 
-// convert empty notes to NULL
 if ($completion_notes === "") {
     $completion_notes = NULL;
 }
 
-// update task
+
 $sql = "UPDATE tasks
         SET status = 'Completed',
             completion_notes = ?,
