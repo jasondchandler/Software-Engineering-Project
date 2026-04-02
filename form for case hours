@@ -1,0 +1,29 @@
+<?php
+session_start();
+require_once("connect.php");
+
+if (empty($_SESSION["user_id"]) || $_SESSION["role"] !== "attorney") {
+    header("Location: login.php");
+    exit;
+}
+
+$case_id = (int)($_POST['case_id'] ?? 0);
+$work_date = $_POST['work_date'] ?? '';
+$hours = (float)($_POST['hours'] ?? 0);
+$description = $_POST['description'] ?? '';
+$attorney_id = $_SESSION['user_id'];
+
+if ($case_id && $work_date && $hours && $description) {
+    $stmt = $conn->prepare("INSERT INTO case_hours (case_id, work_date, hours, description, attorney_id) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param("isdsi", $case_id, $work_date, $hours, $description, $attorney_id);
+    $stmt->execute();
+    $stmt->close();
+    
+    $_SESSION['success'] = "Hours logged successfully.";
+    header("Location: cases_feed.php");
+    exit;
+} else {
+    $_SESSION['error'] = "All fields are required.";
+    header("Location: cases_feed.php");
+    exit;
+}
