@@ -41,21 +41,21 @@ function h($s){
 
 $taskCount = 0;
 
-if ($_SESSION["role"] === "admin") {
-    $r1 = $conn->query("SELECT COUNT(*) AS c FROM tasks");
-    if ($r1) {
-        $taskCount = (int)$r1->fetch_assoc()["c"];
+    if ($_SESSION["role"] === "admin") {
+        $r1 = $conn->query("SELECT COUNT(*) AS c FROM tasks WHERE status = 'Pending'");
+        if ($r1) {
+            $taskCount = (int)$r1->fetch_assoc()["c"];
+        }
+    } else {
+        $stmtCount = $conn->prepare("SELECT COUNT(*) AS c FROM tasks WHERE status = 'Pending' AND user_id = ?");
+        $stmtCount->bind_param("i", $_SESSION["user_id"]);
+        $stmtCount->execute();
+        $resCount = $stmtCount->get_result();
+        if ($resCount) {
+            $taskCount = (int)$resCount->fetch_assoc()["c"];
+        }
+        $stmtCount->close();
     }
-} else {
-    $stmtCount = $conn->prepare("SELECT COUNT(*) AS c FROM tasks WHERE user_id = ?");
-    $stmtCount->bind_param("i", $_SESSION["user_id"]);
-    $stmtCount->execute();
-    $resCount = $stmtCount->get_result();
-    if ($resCount) {
-        $taskCount = (int)$resCount->fetch_assoc()["c"];
-    }
-    $stmtCount->close();
-}
 
 ?>
 
@@ -70,9 +70,9 @@ if ($_SESSION["role"] === "admin") {
 
     <div class="stats">
         <div class="stat">
-            <div class="small">Total Tasks</div>
+            <div class="small">Pending Tasks</div>
             <div class="num"><?php echo $taskCount; ?></div>
-            <div class="small">Currently assigned</div>
+            <div class="small">Awaiting completion</div>
         </div>
     </div>
 
