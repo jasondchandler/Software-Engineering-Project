@@ -1,33 +1,6 @@
-<?php 
-session_start(); 
-require_once("connect.php");
-?>
-<head>
-
-    <title>Charles Casale - Tasks</title>
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-      
-    <script src="site.js" defer></script>
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/x-icon" href="">
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" 
-    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" 
-    crossorigin="anonymous"></script>
-
-</head>
-
-<body>
-
-<?php include "nav.php"; ?>
-
-<div class="main">
 <?php
+session_start();
+require_once("connect.php");
 
 if (empty($_SESSION["user_id"])) {
     $_SESSION["login_error"] = "Please log in.";
@@ -35,329 +8,104 @@ if (empty($_SESSION["user_id"])) {
     exit;
 }
 
-function h($s){ 
-    return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); 
+$task_id = (int) $_POST["task_id"];
+$user_id = (int) $_SESSION["user_id"];
+$completion_notes = trim($_POST["completion_notes"]);
+
+// get task
+$stmt = $conn->prepare("SELECT user_id, can_complete_digitally, status FROM tasks WHERE task_id = ?");
+$stmt->bind_param("i", $task_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$task = $result->fetch_assoc();
+$stmt->close();
+
+// validations
+if (!$task) {
+    $_SESSION["task_error"] = "Task not found.";
+    header("Location: tasks.php");
+    exit;
 }
 
-$taskCount = 0;
+if ((int)$task["user_id"] !== $user_id) {
+    $_SESSION["task_error"] = "You can only complete your own tasks.";
+    header("Location: tasks.php");
+    exit;
+}
 
-if ($_SESSION["role"] === "admin") {
-    $r1 = $conn->query("SELECT COUNT(*) AS c FROM tasks WHERE status = 'Pending'");
-    if ($r1) {
-        $taskCount = (int)$r1->fetch_assoc()["c"];
+if (!(int)$task["can_complete_digitally"]) {
+    $_SESSION["task_error"] = "This task cannot be completed digitally.";
+    header("Location: tasks.php");
+    exit;
+}
+
+if ($task["status"] === "Completed") {
+    $_SESSION["task_error"] = "This task is already completed.";
+    header("Location: tasks.php");
+    exit;
+}
+
+// allow notes OR file OR both
+$hasFile = isset($_FILES["completion_file"]) && $_FILES["completion_file"]["error"] === 0;
+$hasNotes = !empty($completion_notes);
+
+if (!$hasFile && !$hasNotes) {
+    $_SESSION["task_error"] = "Please provide notes or upload a file.";
+    header("Location: tasks.php");
+    exit;
+}
+
+// upload file if exists
+$fileName = NULL;
+
+if ($hasFile) {
+    $uploadDir = "task_uploads/";
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0777, true);
     }
+
+    $originalName = basename($_FILES["completion_file"]["name"]);
+    $extension = pathinfo($originalName, PATHINFO_EXTENSION);
+
+    $fileName = "task_" . $task_id . "_" . time();
+    if ($extension !== "") {
+        $fileName .= "." . $extension;
+    }
+
+    $targetPath = $uploadDir . $fileName;
+
+    if (!move_uploaded_file($_FILES["completion_file"]["tmp_name"], $targetPath)) {
+        $_SESSION["task_error"] = "File upload failed.";
+        header("Location: tasks.php");
+        exit;
+    }
+}
+
+// convert empty notes to NULL
+if ($completion_notes === "") {
+    $completion_notes = NULL;
+}
+
+// update task
+$sql = "UPDATE tasks
+        SET status = 'Completed',
+            completion_notes = ?,
+            completion_file = ?,
+            completed_at = CURRENT_TIMESTAMP
+        WHERE task_id = ?";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("ssi", $completion_notes, $fileName, $task_id);
+
+if ($stmt->execute()) {
+    $_SESSION["task_success"] = "Task completed successfully.";
 } else {
-    $stmtCount = $conn->prepare("SELECT COUNT(*) AS c FROM tasks WHERE status = 'Pending' AND user_id = ?");
-    $stmtCount->bind_param("i", $_SESSION["user_id"]);
-    $stmtCount->execute();
-    $resCount = $stmtCount->get_result();
-    if ($resCount) {
-        $taskCount = (int)$resCount->fetch_assoc()["c"];
-    }
-    $stmtCount->close();
+    $_SESSION["task_error"] = "Failed to complete task.";
 }
 
+$stmt->close();
+$conn->close();
+
+header("Location: tasks.php");
+exit;
 ?>
-
-<div class="container">
-
-    <div class="nav">
-        <div>
-            <h1>Task Dashboard</h1>
-            <div class="small">Welcome back, <?php echo h($_SESSION["name"]); ?></div>
-        </div>
-    </div>
-
-    <div class="stats">
-        <div class="stat">
-            <div class="small">Pending Tasks</div>
-            <div class="num"><?php echo $taskCount; ?></div>
-            <div class="small">Awaiting completion</div>
-        </div>
-    </div>
-
-    <?php
-    if (!empty($_SESSION["task_error"])) {
-        echo '<div class="alert alert-danger text-center mt-3" role="alert">';
-        echo h($_SESSION["task_error"]);
-        echo '</div>';
-        unset($_SESSION["task_error"]);
-    }
-
-    if (!empty($_SESSION["task_success"])) {
-        echo '<div class="alert alert-success text-center mt-3" role="alert">';
-        echo h($_SESSION["task_success"]);
-        echo '</div>';
-        unset($_SESSION["task_success"]);
-    }
-    ?>
-
-    <?php if ($_SESSION["role"] === "admin"): ?>
-        <button type="button" class="btn btn-dark w-100 mt-3 mb-3" data-bs-toggle="modal" data-bs-target="#assignTaskForm">
-            Assign Task
-        </button>
-
-        <div class="modal fade" id="assignTaskForm" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    
-                    <div class="modal-header">
-                        <h5 class="modal-title">Assign Task</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        <form action="create_task.php" method="POST">
-
-                            <div class="mb-3">
-                                <label class="form-label">Assign To:</label>
-                                <select name="user_id" class="form-control" required>
-                                    <?php
-                                    $usersResult = $conn->query("SELECT user_id, firstname, lastname, email, role FROM users WHERE role IN ('client', 'paralegal')");
-                                    while ($userRow = $usersResult->fetch_assoc()) {
-                                        echo '<option value="' . $userRow["user_id"] . '">'
-                                            . h($userRow["firstname"] . ' ' . $userRow["lastname"] . ' | ' . $userRow["email"] . ' | ' . $userRow["role"])
-                                            . '</option>';
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Task Description:</label>
-                                <textarea name="description" class="form-control" required></textarea>
-                            </div>
-
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="digital" name="can_complete_digitally" value="1">
-                                <label class="form-check-label" for="digital">
-                                    Can be completed digitally
-                                </label>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary form-control">Assign Task</button>
-                        </form>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    <?php endif; ?>
-
-    <br><br>
-    <h1>Your Tasks:</h1>
-
-    <?php
-    if ($_SESSION["role"] === "admin") {
-        $sql = "SELECT t.task_id, t.user_id, t.description, t.can_complete_digitally, t.status, 
-                       t.created_at, t.completed_at, t.completion_notes, t.completion_file,
-                       u.firstname, u.lastname, u.email, u.role
-                FROM tasks t
-                JOIN users u ON t.user_id = u.user_id
-                ORDER BY t.created_at DESC";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        $result = $stmt->get_result();
-    } else {
-        $sql = "SELECT task_id, user_id, description, can_complete_digitally, status, 
-                       created_at, completed_at, completion_notes, completion_file
-                FROM tasks
-                WHERE user_id = ?
-                ORDER BY created_at DESC";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $_SESSION["user_id"]);
-        $stmt->execute();
-        $result = $stmt->get_result();
-    }
-    ?>
-
-    <?php if ($result && $result->num_rows > 0): ?>
-        <?php $count = 1; while ($row = $result->fetch_assoc()): ?>
-            <div class="meeting">
-                <span>Task #<?php echo $count; ?></span><br>
-                <span>Description: <?php echo h($row["description"]); ?></span><br>
-                <span>Status: <?php echo h($row["status"]); ?></span><br>
-                <span>Digital Completion: <?php echo $row["can_complete_digitally"] ? "Yes" : "No"; ?></span><br>
-                <span>Created: <?php echo h($row["created_at"]); ?></span><br>
-
-                <?php if (!empty($row["completed_at"])): ?>
-                    <span>Completed: <?php echo h($row["completed_at"]); ?></span><br>
-                <?php endif; ?>
-
-                <?php if (!empty($row["completion_notes"])): ?>
-                    <span>Completion Notes: <?php echo h($row["completion_notes"]); ?></span><br>
-                <?php endif; ?>
-
-                <?php if (!empty($row["completion_file"])): ?>
-                    <span>
-                        Uploaded File:
-                        <a href="task_uploads/<?php echo rawurlencode($row["completion_file"]); ?>" target="_blank">
-                            <?php echo h($row["completion_file"]); ?>
-                        </a>
-                    </span><br>
-                <?php endif; ?>
-
-                <?php if ($_SESSION["role"] === "admin"): ?>
-                    <span>Assigned To: <?php echo h($row["firstname"] . ' ' . $row["lastname"] . ' | ' . $row["email"] . ' | ' . $row["role"]); ?></span><br>
-                <?php endif; ?>
-
-                <hr>
-
-                <div class="d-flex flex-wrap gap-2">
-                    <?php if ($_SESSION["role"] !== "admin" && $row["status"] === "Pending" && $row["can_complete_digitally"]): ?>
-                        <button class="btn btn-success flex-fill" data-bs-toggle="modal" data-bs-target="#completeTask<?php echo $row['task_id']; ?>">
-                            Complete Task
-                        </button>
-                    <?php endif; ?>
-
-                    <?php if ($_SESSION["role"] === "admin"): ?>
-                        <button class="btn btn-warning flex-fill" data-bs-toggle="modal" data-bs-target="#editTask<?php echo $row['task_id']; ?>">
-                            Edit
-                        </button>
-
-                        <button class="btn btn-danger flex-fill" data-bs-toggle="modal" data-bs-target="#deleteTask<?php echo $row['task_id']; ?>">
-                            Delete
-                        </button>
-                    <?php endif; ?>
-                </div>
-
-                <?php if ($_SESSION["role"] !== "admin" && $row["status"] === "Pending" && !$row["can_complete_digitally"]): ?>
-                    <div class="alert alert-secondary mt-2 mb-0 text-center">
-                        This task cannot be completed digitally.
-                    </div>
-                <?php endif; ?>
-            </div>
-
-            <?php if ($_SESSION["role"] !== "admin" && $row["status"] === "Pending" && $row["can_complete_digitally"]): ?>
-                <div class="modal fade" id="completeTask<?php echo $row['task_id']; ?>" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            
-                            <div class="modal-header">
-                                <h5 class="modal-title">Complete Task</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-
-                            <div class="modal-body">
-                                <form action="complete_task.php" method="POST" enctype="multipart/form-data">
-                                    <input type="hidden" name="task_id" value="<?php echo $row['task_id']; ?>">
-
-                                    <div class="mb-3">
-                                        <label class="form-label">Completion Notes:</label>
-                                        <textarea name="completion_notes" class="form-control" placeholder="Add any notes or information here"></textarea>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label class="form-label">Upload File (optional):</label>
-                                        <input type="file" name="completion_file" class="form-control">
-                                        <small class="text-muted">Upload a file OR submit notes.</small>
-                                    </div>
-
-                                    <button type="submit" class="btn btn-primary form-control">Submit Completion</button>
-                                </form>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            <?php endif; ?>
-
-            <?php if ($_SESSION["role"] === "admin"): ?>
-                <div class="modal fade" id="editTask<?php echo $row['task_id']; ?>" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            
-                            <div class="modal-header">
-                                <h5 class="modal-title">Edit Task</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-
-                            <div class="modal-body">
-                                <form action="edit_task.php" method="POST">
-                                    <input type="hidden" name="task_id" value="<?php echo $row['task_id']; ?>">
-
-                                    <div class="mb-3">
-                                        <label class="form-label">Assign To:</label>
-                                        <select name="user_id" class="form-control" required>
-                                            <?php
-                                            $editUsers = $conn->query("SELECT user_id, firstname, lastname, email, role FROM users WHERE role IN ('client', 'paralegal')");
-                                            while ($editUser = $editUsers->fetch_assoc()) {
-                                                $selected = ((int)$editUser["user_id"] === (int)$row["user_id"]) ? "selected" : "";
-                                                echo '<option value="' . $editUser["user_id"] . '" ' . $selected . '>'
-                                                    . h($editUser["firstname"] . ' ' . $editUser["lastname"] . ' | ' . $editUser["email"] . ' | ' . $editUser["role"])
-                                                    . '</option>';
-                                            }
-                                            ?>
-                                        </select>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label class="form-label">Task Description:</label>
-                                        <textarea name="description" class="form-control" required><?php echo h($row["description"]); ?></textarea>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label class="form-label">Status:</label>
-                                        <select name="status" class="form-control" required>
-                                            <option value="Pending" <?php echo ($row["status"] === "Pending") ? "selected" : ""; ?>>Pending</option>
-                                            <option value="Completed" <?php echo ($row["status"] === "Completed") ? "selected" : ""; ?>>Completed</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="mb-3 form-check">
-                                        <input type="checkbox" class="form-check-input" id="digital_<?php echo $row['task_id']; ?>" name="can_complete_digitally" value="1" <?php echo $row["can_complete_digitally"] ? "checked" : ""; ?>>
-                                        <label class="form-check-label" for="digital_<?php echo $row['task_id']; ?>">
-                                            Can be completed digitally
-                                        </label>
-                                    </div>
-
-                                    <button type="submit" class="btn btn-primary form-control">Update Task</button>
-                                </form>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-
-                <div class="modal fade" id="deleteTask<?php echo $row['task_id']; ?>" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            
-                            <div class="modal-header">
-                                <h5 class="modal-title">Delete Task</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-
-                            <div class="modal-body">
-                                Are you sure you want to delete this task?
-                            </div>
-
-                            <div class="modal-footer">
-                                <form action="delete_task.php" method="POST">
-                                    <input type="hidden" name="task_id" value="<?php echo $row['task_id']; ?>">
-                                    <button type="submit" class="btn btn-success">Yes</button>
-                                </form>
-
-                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            <?php endif; ?>
-
-        <?php $count++; endwhile; ?>
-    <?php else: ?>
-        <p>No tasks found.</p>
-    <?php endif; ?>
-
-    <?php
-    if (isset($stmt)) {
-        $stmt->close();
-    }
-    $conn->close();
-    ?>
-
-</div>
-</div>
-</body>
