@@ -18,7 +18,6 @@
 	$stmt->bind_param("sss", $name, $description, basename($fileName));
 	$stmt->execute();
 
-
 	}
 	else {
         $_SESSION["document_error"] = "Failed to upload file";

@@ -40,12 +40,6 @@
 
 	?>
 
-    <div class="nav">
-      <div>
-        <h1>Case Dashboard</h1>
-        <div class="small">Welcome back, <?php echo $_SESSION["name"]; ?></div>
-      </div>
-    </div>
 	  <?php
 $pendingCount = 0;
 $ongoingCount = 0;

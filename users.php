@@ -46,10 +46,6 @@
 
       function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
-        $sql = "SELECT * FROM USERS";
-
-        $result = $conn->query($sql);
-
         if (isset($_SESSION["update_user_error"])) {
 
             echo $_SESSION["update_user_error"];
@@ -57,6 +53,42 @@
         }
 
 	?>
+
+  <div class="search_container"> 
+    <form class="mb-3" method="GET">
+      <input class="form-control mb-2"type=text name="search">
+      <button class="btn btn-dark w-100">Search</button>
+    </form>
+
+    <a class="btn btn-dark w-100"href="<?= strtok($_SERVER['REQUEST_URI'], '?'); ?>" class="btn btn-secondary">Clear Search</a>
+    <?php 
+
+
+      $search = $_GET["search"] ?? "";
+      $where = "
+          firstname LIKE ?
+          OR lastname LIKE ?";
+
+      $like = "%$search%";
+
+      $sql = "SELECT * FROM USERS";
+
+      $params = [];
+      if ($search != "") {
+        $sql = $sql . " WHERE $where";
+        $params[] = $like;
+        $params[] = $like;
+        $types = "ss";
+      }
+      $stmt = $conn->prepare($sql);
+      if ($search != "")
+        $stmt->bind_param($types, ...$params);
+      $stmt->execute();
+      $result = $stmt->get_result();
+
+    ?>
+
+  </div>
 
     <?php $count=1; if ($result && $result->num_rows > 0): ?>
     <?php while ($row = $result->fetch_assoc()): ?>
@@ -74,7 +106,6 @@
                     <select name="role" class="form-control mb-3">
                         <option value="client" <?php if($row['role'] === 'client') echo 'selected'; ?>>Client</option>
                         <option value="paralegal" <?php if($row['role'] === 'paralegal') echo 'selected'; ?>>Paralegal</option>
-                        <option value="admin" <?php if($row['role'] === 'admin') echo 'selected'; ?>>Admin</option>
                     </select>
                     <button type="submit" class="form-control btn btn-primary mt-0">Update</button>
             </form>

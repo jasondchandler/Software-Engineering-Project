@@ -51,3 +51,8 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+function showFrame(id) {
+    var frame = document.getElementById('document' + id);
+    frame.style.display = 'block';
+}

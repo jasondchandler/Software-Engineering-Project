@@ -9,7 +9,7 @@
 	include 'role_function.php';            
 
             ?>
-
+<div class="search_container">
 <form method="GET" action="">
         <label>
             <input type="checkbox" name="hide_pending" value="1" <?php if(!empty($_GET['hide_pending'])) echo 'checked'; ?>> Hide Pending
@@ -17,8 +17,12 @@
         <label>
             <input type="checkbox" name="hide_noshow" value="1" <?php if(!empty($_GET['hide_noshow'])) echo 'checked'; ?>> Hide No-Show
         </label>
+        <label>
+            <input type="checkbox" name="hide_complete" value="1" <?php if(!empty($_GET['hide_complete'])) echo 'checked'; ?>> Hide Completed
+        </label>
         <button type="submit" class="btn btn-primary w-100 mt-2">Apply Filter</button>
     </form>
+        </div>
 <?php  
 
     $filters = [];
@@ -27,6 +31,9 @@
     }
     if (!empty($_GET['hide_noshow'])) {
         $filters[] = "m.status != 'no_show'";
+    }
+    if (!empty($_GET['hide_complete'])) {
+        $filters[] = "m.status != 'complete'";
     }
 
     $where = "m.status != 'cancelled'";

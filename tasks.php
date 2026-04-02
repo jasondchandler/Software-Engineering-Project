@@ -97,6 +97,28 @@ if ($_SESSION["role"] === "admin") {
             Assign Task
         </button>
 
+
+ <div class="search_container"> 
+    <form class="mb-3" method="GET">
+      <input class="form-control mb-2"type=text name="search">
+      <button class="btn btn-dark w-100">Search</button>
+    </form>
+
+    <a class="btn btn-dark w-100"href="<?= strtok($_SERVER['REQUEST_URI'], '?'); ?>" class="btn btn-secondary">Clear Search</a>
+
+    <?php 
+      $search = $_GET["search"] ?? "";
+      $where = "
+           firstname LIKE ?
+          OR lastname LIKE ?
+          OR description LIKE ?";
+
+      $like = "%$search%";
+
+    ?>
+
+  </div>
+
         <div class="modal fade" id="assignTaskForm" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -153,11 +175,23 @@ if ($_SESSION["role"] === "admin") {
                        t.created_at, t.completed_at, t.completion_notes, t.completion_file,
                        u.firstname, u.lastname, u.email, u.role
                 FROM tasks t
-                JOIN users u ON t.user_id = u.user_id
-                ORDER BY t.created_at DESC";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        $result = $stmt->get_result();
+                JOIN users u ON t.user_id = u.user_id"
+                ;
+        $params = [];
+  if ($search != "") {
+    $sql = $sql . " WHERE $where";
+    $params[] = $like;
+    $params[] = $like;
+    $params[] = $like;
+    $types = "sss";
+  }
+$sql = $sql . " ORDER BY t.created_at DESC";
+  $stmt = $conn->prepare($sql);
+  if ($search != "")
+    $stmt->bind_param($types, ...$params);
+  $stmt->execute();
+  $result = $stmt->get_result();
+
     } else {
         $sql = "SELECT task_id, description, can_complete_digitally, status, 
                        created_at, completed_at, completion_notes, completion_file
