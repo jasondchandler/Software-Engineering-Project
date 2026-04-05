@@ -15,25 +15,26 @@ $row = $result->fetch_assoc();
 if ($row && password_verify($password, $row["password"])) {
     $_SESSION["name"] = $row["firstname"] . " " . $row["lastname"];
     $_SESSION["user_id"] = $row["user_id"];
-    if ($_SESSION["name"] === "charles casale") {
-        $_SESSION["role"] = "admin";
-    } else {
-        $_SESSION["role"] = "client";
+    $_SESSION["role"] = $row["role"];
+
+	$sql = "
+    SELECT p.name
+    FROM PERMISSIONS p
+    JOIN ROLE_PERMISSIONS rp 
+        ON p.permission_id = rp.permission_id
+    WHERE rp.role_name = ?
+    ";
+
+	$stmtPerm = $conn->prepare($sql);
+    $stmtPerm->bind_param("s", $_SESSION["role"]);
+    $stmtPerm->execute();
+    $resultPerm = $stmtPerm->get_result();
+
+    $permissions = [];
+    while ($permRow = $resultPerm->fetch_assoc()) {
+        $permissions[$permRow['name']] = true;
     }
-
-	$sql = "SELECT name FROM PERMISSIONS WHERE role = ?";
-
-	$stmt = $conn->prepare($sql);
-	$stmt->bind_param("s", $_SESSION["role"]);
-	$stmt->execute();
-
-	$result = $stmt->get_result();
-	$permissions = [];
-while ($row = $result->fetch_assoc()) {
-    $permissions[] = $row['name'];
-}
-
-$_SESSION["permissions"] = $permissions;
+    $_SESSION["permissions"] = $permissions;
     header("Location: index.php");
     exit;
 } else {

@@ -13,6 +13,6 @@
         die("Connection failed: " . mysqli_connect_error());
     }
 
-    mysqli_select_db($conn, "test") or die("Could not connect to the database");
+    mysqli_select_db($conn, "test3") or die("Could not connect to the database");
 
 ?>

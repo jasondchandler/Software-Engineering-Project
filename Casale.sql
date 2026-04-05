@@ -1,27 +1,65 @@
+CREATE TABLE ROLES (
+    role_name VARCHAR(20) NOT NULL,
+    CONSTRAINT ROLES_FK PRIMARY KEY (role_name)
+);
 
--- Creates
+-- ROLES INSERT
+INSERT IGNORE INTO ROLES (role_name) VALUES
+('client'),
+('paralegal'),
+('admin');
+
 CREATE TABLE USERS (
-    user_id int not null AUTO_INCREMENT,
-    email varchar(20) not null,
-    password varchar(100) not null, 
-    firstname varchar(20) not null,
-    lastname varchar(20) not null,
-    phone varchar(20) null,
-    address varchar(20) null,
-    role varchar(20) default "client",
+    user_id INT NOT NULL AUTO_INCREMENT,
+    email VARCHAR(255) NOT NULL,
+    password VARCHAR(100) NOT NULL, 
+    firstname VARCHAR(30) NOT NULL,
+    lastname VARCHAR(30) NOT NULL,
+    phone VARCHAR(20) NULL,
+    address VARCHAR(255) NULL,
+    role VARCHAR(20) DEFAULT "client",
     CONSTRAINT User_PK PRIMARY KEY (user_id),
     CONSTRAINT Unique_Email UNIQUE (email),
     CONSTRAINT Unique_Phone UNIQUE (phone),
-    CONSTRAINT Check_Role CHECK 
-        (role IN ("client", "paralegal", "admin"))
+    CONSTRAINT FK_User_Role 
+        FOREIGN KEY (role) REFERENCES ROLES(role_name)
 );
 
 CREATE TABLE PERMISSIONS (
-	permission_id int not null AUTO_INCREMENT,
-	name VARCHAR(75) not null,
-	role varchar(20) not null,
-	CONSTRAINT Permission_PK PRIMARY KEY (permission_id)
+    permission_id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(75) NOT NULL,
+    CONSTRAINT Permission_PK PRIMARY KEY (permission_id)
 );
+
+-- PERMISSION INSERTS
+INSERT INTO PERMISSIONS (name) VALUES 
+    ('view-meetings'),
+    ('change-meeting-status'),
+    ('view-users'),
+    ('view-cases'),
+    ('set-times');
+
+CREATE TABLE ROLE_PERMISSIONS (
+    permission_id INT not null,
+    role_name VARCHAR(20) not null,
+    CONSTRAINT RP_PK PRIMARY KEY (role_name, permission_id),
+    CONSTRAINT RP_ROLE_FK FOREIGN KEY (role_name) REFERENCES ROLES(role_name),
+    CONSTRAINT RP_PERMISSION_FK FOREIGN KEY (permission_id) REFERENCES PERMISSIONS(permission_id)
+);
+
+-- ROLE_PERMISSION INSERTS
+INSERT INTO ROLE_PERMISSIONS (role_name, permission_id)
+SELECT 'admin', permission_id FROM PERMISSIONS;
+
+INSERT INTO ROLE_PERMISSIONS (role_name, permission_id)
+SELECT 'paralegal', permission_id
+FROM PERMISSIONS
+WHERE name = 'view-meetings';
+
+INSERT INTO ROLE_PERMISSIONS (role_name, permission_id)
+SELECT 'client', permission_id
+FROM PERMISSIONS
+WHERE name IN ('view-meetings', 'view-cases');
 
 CREATE TABLE TASKS (
     task_id INT NOT NULL AUTO_INCREMENT,
@@ -39,18 +77,6 @@ CREATE TABLE TASKS (
         status IN ('Pending', 'Completed')
     )
 );
-
-/**************
-INSERT STATEMENTS FOR PERMISSIONS
-kebab case, lowercase, <75 chars
-**************/
-INSERT INTO PERMISSIONS (name, role) VALUES ('view-meetings', 'client');
-INSERT INTO PERMISSIONS (name, role) VALUES ('view-meetings', 'admin');
-INSERT INTO PERMISSIONS (name, role) VALUES ('view-meetings', 'paralegal');
-INSERT INTO PERMISSIONS (name, role) VALUES ('change-meeting-status', 'admin');
-INSERT INTO PERMISSIONS (name, role) VALUES ('view-users', 'admin');
-INSERT INTO PERMISSIONS (name, role) VALUES ('set-times', 'admin');
-
 
 CREATE TABLE MEETINGS (
   meeting_id int NOT NULL AUTO_INCREMENT,
@@ -76,9 +102,10 @@ CREATE TABLE MEETING_TIMES (
 
 CREATE TABLE CASES (
     case_id int not null AUTO_INCREMENT,
-    title varchar(50) not null,
-    court varchar(50) not null,
-    type varchar(20) not null,
+    user_id int not null,
+    title varchar(100) not null,
+    court varchar(100) not null,
+    type varchar(30) not null,
     filing_date DATE not null,
     status varchar(20) not null,
     CONSTRAINT Case_PK PRIMARY KEY (case_id),
@@ -115,15 +142,6 @@ CREATE TABLE case_hours (
     CONSTRAINT CH_Case_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
 );
 
-CREATE TABLE CASE_USERS (
-    user_id int not null,
-    case_id int not null,
-    CONSTRAINT CU_PK PRIMARY KEY (user_id, case_id),
-    CONSTRAINT CU_User_FK FOREIGN KEY (user_id) REFERENCES Users(user_id),
-    CONSTRAINT CU_Case_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
-);
-
-
 CREATE TABLE CASE_RETAINERS (
     case_id int not null,
 	value int not null,
@@ -145,7 +163,9 @@ CREATE TABLE DOCUMENTS (
 Run this to give an account admin role
 change the where clause as needed
 **************/
-UPDATE users SET role = 'admin' WHERE user_id = 1;
+UPDATE USERS
+SET role = 'admin'
+WHERE user_id = 1;  
 
 
 

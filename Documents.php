@@ -144,7 +144,7 @@
 
       <?php
 
-          if ($_SESSION["role"] === "client") {
+          if ($_SESSION["role"] === "client" || $_SESSION["role"] == "paralegal") {
   $sql = "
   SELECT *
   FROM documents d

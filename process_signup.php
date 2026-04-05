@@ -78,8 +78,13 @@ if ($stmt->execute()) {
         $_SESSION["role"] = "client";
     }
 
-	$sql = "SELECT name FROM PERMISSIONS WHERE role = ? OR role = 'all'";
-
+	$sql = "
+    SELECT p.name
+    FROM PERMISSIONS p
+    JOIN ROLE_PERMISSIONS rp 
+        ON p.permission_id = rp.permission_id
+    WHERE rp.role_name = ?
+";
 	$stmt = $conn->prepare($sql);
 	$stmt->bind_param("s", $_SESSION["role"]);
 	$stmt->execute();
