@@ -5,8 +5,7 @@
               echo htmlspecialchars($_SESSION["edit_meeting_error"]);
               echo "</div>";
           }
-		
-	include 'role_function.php';            
+		          
 
             ?>
 <div class="search_container">

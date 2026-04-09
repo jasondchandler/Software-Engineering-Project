@@ -25,8 +25,7 @@
 <body>
 
   <?php 
-    include "nav.php";
-    include "role_function.php";?>
+    include "nav.php";?>
 
 
   <div class = "main">
@@ -36,6 +35,57 @@
         <h1>Document Dashboard</h1>
         <div class="small">Welcome back, <?php echo $_SESSION["name"]; ?></div>
       </div>
+    </div>
+
+  <?php 
+  if ($_SESSION["role"] !== "admin") {
+
+    $sql = "
+    SELECT COUNT(d.document_id) AS total_documents
+    FROM users u
+    JOIN cases c ON c.user_id = u.user_id
+    JOIN documents d ON d.case_id = c.case_id
+    WHERE u.user_id = ?
+";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $_SESSION["user_id"]);
+$stmt->execute();
+
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+
+$documentCount = $row["total_documents"] ?? 0;
+
+$stmt->close();
+  }
+
+  else {
+
+$sql = "
+    SELECT COUNT(d.document_id) AS total_documents
+    FROM documents d;
+";
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+
+$documentCount = $row["total_documents"] ?? 0;
+
+$stmt->close();
+
+  }
+  ?>
+
+    <div class="stats  mb-3">
+            <div class="stat text-center">
+            <div class="small">Document count</div>
+            <div class="num fs-4"><?php echo $documentCount; ?></div>
+            <div class="small">In system</div>
+        </div>    
+    
     </div>
 
       <?php
@@ -59,7 +109,13 @@
  } ?>
 
 
-	<button class="btn btn-dark flex-fill mb-3 mt-3 w-100" data-bs-toggle="modal" data-bs-target="#uploadDocument">Upload Document</button>
+	<?php if (allow("upload-document")): ?>
+    <button class="btn btn-dark flex-fill mb-3 mt-3 w-100"
+        data-bs-toggle="modal"
+        data-bs-target="#uploadDocument">
+        Upload Document
+    </button>
+<?php endif; ?>
 	
   <div class="search_container"> 
     <form class="mb-3" method="GET">
@@ -69,18 +125,8 @@
 
     <a class="btn btn-primary w-100"href="<?= strtok($_SERVER['REQUEST_URI'], '?'); ?>">Clear Search</a>
 
-    <?php 
-      $search = $_GET["search"] ?? "";
-      $where = "
-           name LIKE ?
-          OR description LIKE ?
-          OR title LIKE ?";
 
-      $like = "%$search%";
-
-    ?>
-
-        <hr><br><br>
+        <hr><br>
     <h1>Your documents:</h1>
 
   </div>
@@ -128,43 +174,60 @@
               <?php endwhile; ?>
           </select>
 
-	  <label class="form-label">Describe the file:</label>
-          <input type="text" class="form-control mb-3" name="description">
+          <input type="hidden" name="document_id" value="<?= $row['document_id']; ?>">
 
-	  <button type="submit" class="form-control btn btn-success">Submit</button>
+	  <label class="form-label">Describe the file:</label>
+          <input type="text" class="form-control mb-4" name="description">
+
+            <hr>
+	  <button type="submit" class="form-control btn btn-primary mt-4">Upload</button>
         </form>
                     </div>
-                    
-                    <div class="modal-footer">
-                
-                    </div>
+
                   </div>
                 </div>
               </div>
 
       <?php
 
-          if ($_SESSION["role"] === "client" || $_SESSION["role"] == "paralegal") {
-  $sql = "
-  SELECT *
-  FROM documents d
-  LEFT JOIN cases c on d.case_id = c.case_id";
+          if ($_SESSION["role"] === "client" || $_SESSION["role"] === "paralegal") {
 
-  $params = [];
-  if ($search != "") {
-    $sql = $sql . "WHERE $where";
-    $params[] = $like;
-    $params[] = $like;
-    $params[] = $like;
-    $types = "sss";
-  }
-  $stmt = $conn->prepare($sql);
-  if ($search != "")
+    $search = $_GET["search"] ?? "";
+
+    $sql = "
+        SELECT *
+        FROM users u
+        JOIN cases c ON c.user_id = u.user_id
+        JOIN documents d ON d.case_id = c.case_id
+        WHERE u.user_id = ?
+    ";
+
+    $params = [$_SESSION["user_id"]];
+    $types = "i";
+
+    if ($search != "") {
+        $sql .= " AND (u.firstname LIKE ? OR u.lastname LIKE ? OR d.description LIKE ?)";
+        $like = "%$search%";
+        $params[] = $like;
+        $params[] = $like;
+        $params[] = $like;
+        $types .= "sss";
+    }
+
+    $stmt = $conn->prepare($sql);
     $stmt->bind_param($types, ...$params);
-  $stmt->execute();
-  $result = $stmt->get_result();
-} 
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+}
 elseif ($_SESSION["role"] === "admin") {
+
+$search = $_GET["search"] ?? "";
+      $where = "
+           name LIKE ?
+          OR description LIKE ?";
+
+      $like = "%$search%";
 
     $sql = "
     SELECT *
@@ -176,8 +239,7 @@ elseif ($_SESSION["role"] === "admin") {
     $sql = $sql . "WHERE $where";
     $params[] = $like;
     $params[] = $like;
-    $params[] = $like;
-    $types = "sss";
+    $types = "ss";
   }
   $stmt = $conn->prepare($sql);
   if ($search != "")
@@ -190,11 +252,11 @@ elseif ($_SESSION["role"] === "admin") {
   <?php $count=1; if ($result && $result->num_rows > 0): ?>
     <?php while ($row = $result->fetch_assoc()): ?>
         <div class="meeting">
-            <span>Document #<?php echo $count; ?></span><br>
-            <span>Document name: <?php echo $row["name"];?></span>
+
+            <span class="name">Document name: <?php echo $row["name"];?></span>
             <span><?php 
               if (isset($row["case_id"])) {
-                echo "Related case: " . $row["title"];
+                echo "<br>Related case: " . $row["title"];
               }
             ?></span> <br>
             <span>
@@ -208,17 +270,97 @@ elseif ($_SESSION["role"] === "admin") {
             <iframe style="display:none;" id="document<?php echo $count;?>"class="w-100" src="<?php echo "files/".$row["path"];?>"> </iframe><br>
             <button class="btn btn-dark w-100"onclick="showFrame(<?php echo $count;?>)">Show document here</button>
             
-            <br><br>
-            <a class="btn btn-dark w-100"href="<?php echo "files/".$row["path"];?>" target="_blank">
+            <br>
+            <a class="btn btn-dark w-100 mt-3"href="<?php echo "files/".$row["path"];?>" target="_blank">
             Open in new tab
             </a>
 
+            <br><hr>
+                
+                <?php 
+                
+                if (allow("delete-document")) {
+    echo '<div class="d-flex gap-2">';
+    echo '<button class="btn btn-danger flex-fill" 
+            data-bs-toggle="modal" 
+            data-bs-target="#deleteDocumentForm' . $row['document_id'] . '">
+            Delete document
+          </button>';
+    echo '</div><br>';
+  }
+
+  if (allow("edit-document-user")) {
+    echo '<div class="d-flex gap-2">';
+    echo '<button class="btn btn-primary flex-fill" 
+            data-bs-toggle="modal" 
+            data-bs-target="#addUser' . $row['document_id'] . '">
+            Add user to document
+          </button>';
+    echo '</div>';
+}
+
+                ?>
+
+                <div class="modal fade" id="addUser<?= $row['document_id'] ?>" 
+     data-edit-modal="<?php echo $show_edit_modal ? 'true' : 'false'; ?>" 
+     tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Select a user to add: </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="add_user_document.php" method="POST">
+
+                <div class="mb-3">
+                  
+                  <label class="form-label">Assign To:</label>
+                  <select name="user_id" class="form-control" required>
+                    <?php
+                    $usersResult = $conn->query("SELECT user_id, firstname, lastname, email, role FROM users WHERE role IN ('client', 'paralegal')");
+                    while ($userRow = $usersResult->fetch_assoc()) {
+                        echo '<option value="' . $userRow["user_id"] . '">'
+                            . h($userRow["firstname"] . ' ' . $userRow["lastname"] . ' | ' . $userRow["email"] . ' | ' . $userRow["role"])
+                            . '</option>';
+                    }
+                    ?>
+                  </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary form-control">Assign Task</button>
+              </form>
+      </div>
+    </div>
+  </div>
+</div> 
+
+            <div class="modal fade" id="deleteDocumentForm<?= $row['document_id'] ?>" 
+     data-edit-modal="<?php echo $show_edit_modal ? 'true' : 'false'; ?>" 
+     tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Are you sure you want to delete this document?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="delete_document.php" method="POST">
+        <input type="hidden" name="document_id" value="<?php echo $row['document_id']; ?>">
+
+                <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary flex-fill">Delete document</button>
+        <a href="cases.php" class="btn btn-secondary flex-fill">Keep document</a></div>
+    </form>
+      </div>
+    </div>
+  </div>
+</div> </div>
           
-        </div>
       <?php $count++;?>
     <?php endwhile; ?>
   <?php else: ?>
-    <p>No meetings found.</p>
+    <p>No documents found.</p>
   <?php endif; ?>
   </div>
 

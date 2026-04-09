@@ -1,4 +1,7 @@
-    <?php $current = basename($_SERVER["PHP_SELF"]); ?>
+    <?php 
+    $current = basename($_SERVER["PHP_SELF"]); 
+    include "role_function.php";
+    ?>
 
     <nav id = "navigation" class="navbar navbar-expand-lg fixed-top py-0 navbar-dark bg-dark">
         <div class="container-fluid">
@@ -43,13 +46,23 @@
 
         <a class="<?php echo ($current == "meetings.php") ? "active" : ""; ?>" href = "meetings.php">Meetings</a>
 
-	<a class="<?php echo ($current == "cases.php") ? "active" : ""; ?>" href = "cases.php">Cases</a>
+    <?php 
+        if (allow("view-cases")) {
+            echo '<a class="' . ($current == "cases.php" ? "active" : "") . '" href="cases.php">Cases</a>';
+        }
+    ?>
 
 	<a class="<?php echo ($current == "tasks.php") ? "active" : ""; ?>" href = "tasks.php">Tasks</a>
 
-	<a class="<?php echo ($current == "Documents.php") ? "active" : ""; ?>" href = "Documents.php">Documents</a>
+	<a class="<?php echo ($current == "Documents.php" || $current == "documents.php") ? "active" : ""; ?>" href = "Documents.php">Documents</a>
 
-    <a class="<?php echo ($current == "users.php") ? "active" : ""; ?>" href = "users.php">Users</a>
+    <?php 
+        if (allow("view-users")) {
+            echo '<a class="' . ($current == "users.php" ? "active" : "") . '" href="users.php">Users</a>';
+        }
+    ?>
+
+    
 
 
         <script src = "https://code.jquery.com/jquery-3.6.0.min.js" defer></script>

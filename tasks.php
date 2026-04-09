@@ -41,7 +41,7 @@ function h($s){
 
 $taskCount = 0;
 
-if ($_SESSION["role"] === "admin") {
+if (allow("edit-task")) {
     $r1 = $conn->query("SELECT COUNT(*) AS c FROM tasks WHERE status = 'Pending'");
     if ($r1) {
         $taskCount = (int)$r1->fetch_assoc()["c"];
@@ -75,23 +75,7 @@ if ($_SESSION["role"] === "admin") {
       </div>
     </div>
 
-    <?php
-    if (!empty($_SESSION["task_error"])) {
-        echo '<div class="alert alert-danger text-center mt-3" role="alert">';
-        echo h($_SESSION["task_error"]);
-        echo '</div>';
-        unset($_SESSION["task_error"]);
-    }
-
-    if (!empty($_SESSION["task_success"])) {
-        echo '<div class="alert alert-success text-center mt-3" role="alert">';
-        echo h($_SESSION["task_success"]);
-        echo '</div>';
-        unset($_SESSION["task_success"]);
-    }
-    ?>
-
-    <?php if ($_SESSION["role"] === "admin"): ?>
+<?php if (allow("edit-task")): ?>
       <button type="button" class="btn btn-dark w-100 mt-3 mb-3" data-bs-toggle="modal" data-bs-target="#assignTaskForm">
         Assign Task
       </button>
@@ -142,35 +126,125 @@ if ($_SESSION["role"] === "admin") {
         </div>
       </div>
     <?php endif; ?>
+                    
+    <div class="search_container"> 
+    <form class="mb-3" method="GET">
+      <input class="form-control mb-3"type=text name="search" placeholder="Enter search term...">
+      <button class="btn btn-primary w-100">Search</button>
+    </form> </div>
+
+    <a class="btn btn-primary w-100"href="<?= strtok($_SERVER['REQUEST_URI'], '?'); ?>">Clear Search</a>
+
+    <?php
+    if (!empty($_SESSION["task_error"])) {
+        echo '<div class="alert alert-danger text-center mt-3" role="alert">';
+        echo h($_SESSION["task_error"]);
+        echo '</div>';
+        unset($_SESSION["task_error"]);
+    }
+
+    if (!empty($_SESSION["task_success"])) {
+        echo '<div class="alert alert-success text-center mt-3" role="alert">';
+        echo h($_SESSION["task_success"]);
+        echo '</div>';
+        unset($_SESSION["task_success"]);
+    }
+    ?>
 
     <br><br>
     <h1>Your Tasks:</h1>
 
     <?php
     if ($_SESSION["role"] === "admin") {
+        
+
         $sql = "SELECT t.*, u.firstname, u.lastname, u.email, u.role
-                FROM tasks t
-                JOIN users u ON t.user_id = u.user_id
-                ORDER BY t.created_at DESC";
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        $result = $stmt->get_result();
-    } else {
-        $sql = "SELECT *
-                FROM tasks
-                WHERE user_id = ?
-                ORDER BY created_at DESC";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $_SESSION["user_id"]);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        FROM tasks t
+        JOIN users u ON t.user_id = u.user_id";
+
+$search = $_GET["search"] ?? "";
+      
+        $where = "description LIKE ? OR user_id LIKE ?";
+
+      $like = "%$search%";
+
+$params = [];
+$types = "";
+
+
+if ($search !== "") {
+    $sql .= " WHERE u.firstname LIKE ? OR u.lastname LIKE ? OR t.description LIKE ?";
+    $params[] = $like;
+    $params[] = $like;
+    $params[] = $like;
+    $types = "sss";
+}
+
+$sql .= " ORDER BY t.created_at DESC";
+
+$stmt = $conn->prepare($sql);
+
+if (!empty($params)) {
+    $stmt->bind_param($types, ...$params);
+}
+
+$stmt->execute();
+$result = $stmt->get_result();
+
+  
     }
+    else {
+
+        $sql = "SELECT t.*, u.firstname, u.lastname, u.email, u.role
+        FROM tasks t
+        JOIN users u ON t.user_id = u.user_id";
+
+$search = $_GET["search"] ?? "";
+      $like = "%$search%";
+
+$params = [];
+$types = "";
+
+
+
+if ($search !== "") {
+    $sql .= " WHERE t.description LIKE ? AND t.user_id = ?";
+    $params[] = $like;
+    $params[] = $_SESSION["user_id"];
+    $types = "si"; 
+}
+else {
+    $sql .= " WHERE t.user_id = ?";
+    $params[] = $_SESSION["user_id"];
+    $types = "i"; 
+
+}
+
+$sql .= " ORDER BY t.created_at DESC";
+
+$stmt = $conn->prepare($sql);
+
+if (!empty($params)) {
+    $stmt->bind_param($types, ...$params);
+}
+
+
+$stmt->execute();
+$result = $stmt->get_result();
+
+
+    }
+
+
     ?>
 
     <?php if ($result && $result->num_rows > 0): ?>
       <?php $count = 1; while ($row = $result->fetch_assoc()): ?>
         <div class="meeting">
-            <span>Task #<?php echo $count; ?></span><br>
+            <span class="<?php if ($_SESSION["role"] != "admin") echo "name";?>">Task #<?php echo $count; ?></span><br>
+            <?php if ($_SESSION["role"] === "admin"): ?>
+                <span class="name"><?php echo h($row["firstname"] . " " . $row["lastname"] . " | " . $row["email"]); ?></span><br>
+            <?php endif; ?>
             <span>Description: <?php echo h($row["description"]); ?></span><br>
             <span>Status: <?php echo h($row["status"]); ?></span><br>
             <span>Digital Completion: <?php echo $row["can_complete_digitally"] ? "Yes" : "No"; ?></span><br>
@@ -187,23 +261,20 @@ if ($_SESSION["role"] === "admin") {
             <?php if (!empty($row["completion_file"])): ?>
                 <span>
                     File:
-                    <a href="task_uploads/<?php echo rawurlencode($row["completion_file"]); ?>" target="_blank">
+                    <a href="files/<?php echo rawurlencode($row["completion_file"]); ?>" target="_blank">
                         View
                     </a>
                 </span><br>
             <?php endif; ?>
 
-            <?php if ($_SESSION["role"] === "admin"): ?>
-                <span>Assigned To: <?php echo h($row["firstname"] . " " . $row["lastname"] . " | " . $row["email"] . " | " . $row["role"]); ?></span><br>
-            <?php endif; ?>
 
             <hr>
 
             <div class="d-flex flex-wrap gap-2">
 
                 <?php if ($_SESSION["role"] !== "admin" && $row["status"] === "Pending" && $row["can_complete_digitally"]): ?>
-                    <button class="btn btn-success flex-fill" data-bs-toggle="modal" data-bs-target="#complete<?php echo $row["task_id"]; ?>">
-                        Complete Task
+                    <button class="btn btn-primary flex-fill" data-bs-toggle="modal" data-bs-target="#complete<?php echo $row["task_id"]; ?>">
+                        Complete digitally
                     </button>
                 <?php endif; ?>
 
@@ -272,6 +343,7 @@ if ($_SESSION["role"] === "admin") {
                     <div class="modal-body">
                         <form action="edit_task.php" method="POST">
                             <input type="hidden" name="task_id" value="<?php echo $row["task_id"]; ?>">
+                            <input type="hidden" name="user_id" value="<?php echo $row["user_id"]; ?>">
 
                             <div class="mb-3">
                                 <label class="form-label">Task Description:</label>

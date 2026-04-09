@@ -59,7 +59,7 @@ if (!$hasFile && !$hasNotes) {
 $fileName = NULL;
 
 if ($hasFile) {
-    $uploadDir = "task_uploads/";
+    $uploadDir = "files/";
     if (!is_dir($uploadDir)) {
         mkdir($uploadDir, 0777, true);
     }
@@ -73,6 +73,10 @@ if ($hasFile) {
     }
 
     $targetPath = $uploadDir . $fileName;
+
+    $sql = "insert into documents (name, path) values ('$originalName', '$fileName')";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
 
     if (!move_uploaded_file($_FILES["completion_file"]["tmp_name"], $targetPath)) {
         $_SESSION["task_error"] = "File upload failed.";

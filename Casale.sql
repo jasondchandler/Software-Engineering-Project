@@ -37,7 +37,15 @@ INSERT INTO PERMISSIONS (name) VALUES
     ('change-meeting-status'),
     ('view-users'),
     ('view-cases'),
-    ('set-times');
+    ('set-times'),
+    ('edit-task'),
+    ('delete-task'),
+    ('edit-case'),
+    ('delete-case'),
+    ('create-case'),
+    ('delete-document'),
+    ('edit-document-user')
+    ;
 
 CREATE TABLE ROLE_PERMISSIONS (
     permission_id INT not null,
@@ -71,6 +79,7 @@ CREATE TABLE TASKS (
     completion_file VARCHAR(200) NULL,
     completed_at TIMESTAMP NULL DEFAULT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    due TIMESTAMP NOT NULL, 
     CONSTRAINT Task_PK PRIMARY KEY (task_id),
     CONSTRAINT Task_User_FK FOREIGN KEY (user_id) REFERENCES USERS(user_id),
     CONSTRAINT Task_Status_Check CHECK (
@@ -102,7 +111,7 @@ CREATE TABLE MEETING_TIMES (
 
 CREATE TABLE CASES (
     case_id int not null AUTO_INCREMENT,
-    user_id int not null,
+    user_id int null,
     title varchar(100) not null,
     court varchar(100) not null,
     type varchar(30) not null,
@@ -157,6 +166,22 @@ CREATE TABLE DOCUMENTS (
 	path varchar(200) not null, 
     CONSTRAINT D_PK PRIMARY KEY (document_id),
     CONSTRAINT D_Case_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
+);
+
+CREATE TABLE Cases_users (
+    case_id int not null,
+    user_id int not null,
+    CONSTRAINT CU_PK PRIMARY KEY (case_id, user_id),
+    CONSTRAINT CU_FK_CASE FOREIGN KEY (case_id) REFERENCES Cases(case_id),
+    CONSTRAINT CU_FK_USER FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
+CREATE TABLE Documents_Users (
+    document_id int not null,
+    user_id int not null,
+    CONSTRAINT DU_PK PRIMARY KEY (document_id, user_id),
+    CONSTRAINT DU_FK_DOC FOREIGN KEY (document_id) REFERENCES Documents(document_id),
+    CONSTRAINT DU_FK_USER FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
 
 /**************

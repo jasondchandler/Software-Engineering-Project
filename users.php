@@ -38,9 +38,15 @@
 
       <?php
 
-      if (empty($_SESSION["user_id"]) || $_SESSION["role"] != "admin") {
+      if (empty($_SESSION["user_id"])) {
         header("Location: login.php");
 	      $_SESSION["login_error"] = "Please log in.";
+        exit;
+      }
+
+      if (!allow("view-users")) {
+        $_SESSION["permission_error"] = "You do not have permission.";
+        header("Location: index.php");
         exit;
       }
 
@@ -97,17 +103,37 @@
     <?php $count=1; if ($result && $result->num_rows > 0): ?>
     <?php while ($row = $result->fetch_assoc()): ?>
         <div class="meeting">
-            <span>User #<?php echo $count; ?></span><br>
-            <span>Name: <?php echo h($row["firstname"] . " " . $row["lastname"]); ?></span><br>
-            <span>Phone: <?php echo h($row["phone"] ?: "N/A"); ?></span><br>
-            <span>Address: <?php echo h($row["address"] ?: "N/A"); ?></span><br>
+            <span class ="name"><?php echo h($row["firstname"] . " " . $row["lastname"]); ?></span><br>
+            
+            <span>Email: <?php echo h($row["email"]); ?></span><br>
+            
+            <?php 
+            if (isset($row["phone"])) {
 
+              echo "<span>Phone:";
+              echo sprintf("(%s) %s-%s",
+                    substr($row["phone"], 0, 3),
+                    substr($row["phone"], 3, 3),
+                    substr($row["phone"], 6)
+                );
+                echo "</span><br>";
+            }
+            
+            if (isset($row["address"])) {
+
+              echo "<span>Address:";
+              echo $row["address"];
+              echo "</span><br>";
+            }
+            ?>
+
+            
             <hr>
 
             <form action="update_role.php" method="POST" class="mb-2">
                     <input type="hidden" name="user_id" value="<?php echo $row['user_id']; ?>">
                     <label>Role:</label>
-                    <select name="role" class="form-control mb-3">
+                    <select name="role" class="form-control">
                         <option value="client" <?php if($row['role'] === 'client') echo 'selected'; ?>>Client</option>
                         <option value="paralegal" <?php if($row['role'] === 'paralegal') echo 'selected'; ?>>Paralegal</option>
                     </select>

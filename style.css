@@ -216,6 +216,11 @@ footer {
     min-width: 255px;
 }
 
+.name {
+    font-weight: bold;
+    font-size: 20px;
+}
+
 .num{
     font-size:28px;
     font-weight:700;

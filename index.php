@@ -32,6 +32,19 @@
                 <h2> Content</h2>
                 <p><?php var_dump($_SESSION);?>
                 </p>
+                <br><br>
+
+                <?php 
+                
+                if (isset($_SESSION["permission_error"])) {
+
+                    echo '<div class="alert alert-danger text-center" role="alert">';
+                    echo $_SESSION["permission_error"];
+                    echo "</div>";
+                    unset($_SESSION["permission_error"]);
+                }
+                
+                ?>
 
                 <br><br>
             </div>

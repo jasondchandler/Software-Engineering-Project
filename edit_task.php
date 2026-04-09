@@ -45,7 +45,7 @@ if ($status === "Pending") {
                 completed_at = NULL
             WHERE task_id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("isissi", $user_id, $description, $can_complete_digitally, $status, $task_id);
+    $stmt->bind_param("isisi", $user_id, $description, $can_complete_digitally, $status, $task_id);
 } else {
     $sql = "UPDATE tasks
             SET user_id = ?,
@@ -55,7 +55,7 @@ if ($status === "Pending") {
                 completed_at = COALESCE(completed_at, CURRENT_TIMESTAMP)
             WHERE task_id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("isissi", $user_id, $description, $can_complete_digitally, $status, $task_id);
+    $stmt->bind_param("isisi", $user_id, $description, $can_complete_digitally, $status, $task_id);
 }
 
 if ($stmt->execute()) {
