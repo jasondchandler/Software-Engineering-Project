@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Charles Casale Law</title>
+  <style>
+    * { box-sizing: border-box; scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+      color: #ffffff;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(10px);
+      background: rgba(0,0,0,0.6);
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      z-index: 1000;
+    }
+
+    .logo {
+      font-size: 26px;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    nav a {
+      color: #ccc;
+      margin-left: 25px;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+
+    nav a:hover {
+      color: #ffffff;
+    }
+
+    .hero {
+      padding: 120px 20px;
+      text-align: center;
+      background: url('https://images.unsplash.com/photo-1602539784414-3c748f7f7f50?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat, radial-gradient(circle at top, #222, #0f0f0f);
+    }
+
+    .hero h1 {
+      font-size: 48px;
+      margin-bottom: 15px;
+      background: linear-gradient(to right, #ffffff, #bbbbbb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 18px;
+      max-width: 650px;
+      margin: auto;
+      color: #ddd;
+    }
+
+    .section {
+      padding: 80px 20px;
+      max-width: 1100px;
+      margin: auto;
+      position: relative;
+    }
+
+    .section h2 {
+      text-align: center;
+      margin-bottom: 50px;
+      font-size: 32px;
+    }
+
+    .practice-areas {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 30px;
+    }
+
+    .card {
+      padding: 25px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+      transition: 0.3s;
+      text-align: center;
+    }
+
+    .card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.7);
+    }
+
+    .card img {
+      width: 60px;
+      margin-bottom: 15px;
+      filter: invert(1);
+    }
+
+    .card p { color: #bbb; font-size: 14px; }
+
+    .about {
+      text-align: center;
+      color: #bbb;
+      line-height: 1.6;
+      max-width: 800px;
+      margin: auto;
+      background: url('https://images.unsplash.com/photo-1603032704510-8a5c5c9a4084?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;
+      padding: 60px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .cta {
+      margin-top: 60px;
+      text-align: center;
+      padding: 70px 20px;
+      background: linear-gradient(135deg, #ffffff, #cccccc);
+      color: #000;
+      border-radius: 30px;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta button {
+      margin-top: 15px;
+      background: #000;
+      color: #fff;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 30px;
+      cursor: pointer;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: #777;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">⚖ Charles Casale Law</div>
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#practice">Practice Areas</a>
+    <a href="#about">About</a>
+    <a href="signup.php">Sign Up</a>
+  </nav>
+</header>
+
+<section id="home" class="hero">
+  <h1>Powerful Legal Representation</h1>
+  <p>Relentless advocacy. Strategic thinking. Results that matter.</p>
+</section>
+
+<section id="practice" class="section">
+  <h2>Practice Areas</h2>
+  <div class="practice-areas">
+
+    <div class="card">
+      <img src="https://img.icons8.com/ios-filled/100/law.png" />
+      <h3>Workers' Compensation</h3>
+      <p>Recover benefits and wages quickly.</p>
+    </div>
+
+    <div class="card">
+      <img src="https://img.icons8.com/ios-filled/100/family.png" />
+      <h3>Matrimonial Law</h3>
+      <p>Divorce, custody, and family matters handled with care.</p>
+    </div>
+
+    <div class="card">
+      <img src="https://img.icons8.com/ios-filled/100/car-crash.png" />
+      <h3>Personal Injury</h3>
+      <p>Maximum compensation for your injuries.</p>
+    </div>
+
+    <div class="card">
+      <img src="https://img.icons8.com/ios-filled/100/handcuffs.png" />
+      <h3>Criminal Defense</h3>
+      <p>Protecting your rights and freedom.</p>
+    </div>
+
+  </div>
+</section>
+
+<section id="about" class="section">
+  <h2>About the Attorney</h2>
+  <p class="about">
+    We deliver strategic, results-driven legal representation tailored to each client.
+  </p>
+
+  <div class="cta">
+    <h2>Get Started Today</h2>
+    <p>Click below to sign up and begin your case.</p>
+    <button onclick="window.location.href='signup.php'">Sign Up</button>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 Charles Casale Law. All Rights Reserved.</p>
+</footer>
+
+</body>
+</html>
