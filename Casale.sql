@@ -215,3 +215,4 @@ ORDER BY activity_date DESC;
 
 ALTER TABLE cases ADD COLUMN assigned_to INT NULL;
 
+ALTER TABLE appointments ADD COLUMN client_email VARCHAR(190) NULL AFTER client_name;
