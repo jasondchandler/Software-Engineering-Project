@@ -72,7 +72,7 @@ elseif ($_SESSION["role"] === "admin") {
 
   <?php $count=1; if ($result && $result->num_rows > 0): ?>
     <?php while ($row = $result->fetch_assoc()): ?>
-        <div class="meeting">
+        <div class="card">
             <span>Meeting #<?php echo $count; ?></span><br>
             <span>Status: <?php echo $row["status"];?></span> <br>
             <span>Time: 

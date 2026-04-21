@@ -44,7 +44,12 @@ INSERT INTO PERMISSIONS (name) VALUES
     ('delete-case'),
     ('create-case'),
     ('delete-document'),
-    ('edit-document-user')
+    ('edit-document-user'),
+    ('view-tasks'),
+    ('view-documents'),
+    ('upload-document'),
+    ('view-chats'),
+    ('create-chat')
     ;
 
 CREATE TABLE ROLE_PERMISSIONS (
@@ -62,12 +67,34 @@ SELECT 'admin', permission_id FROM PERMISSIONS;
 INSERT INTO ROLE_PERMISSIONS (role_name, permission_id)
 SELECT 'paralegal', permission_id
 FROM PERMISSIONS
-WHERE name = 'view-meetings';
+WHERE name = 'view-meetings', 'view-task', 'view-chats';
 
 INSERT INTO ROLE_PERMISSIONS (role_name, permission_id)
 SELECT 'client', permission_id
 FROM PERMISSIONS
-WHERE name IN ('view-meetings', 'view-cases');
+WHERE name IN ('view-chats', 'view-meetings', 'view-cases', 'view-documents', 'view-task');
+
+CREATE TABLE CHATS (
+    chat_id INT NOT NULL AUTO_INCREMENT,
+    CONSTRAINT Chat_PK PRIMARY KEY (chat_id)
+);
+
+CREATE TABLE CHAT_USERS (
+    chat_id INT NOT NULL,
+    user_id INT NOT NULL,
+    CONSTRAINT Chat_User_PK PRIMARY KEY (chat_id, user_id),
+    CONSTRAINT Chat_User_FK_User FOREIGN KEY (user_id) REFERENCES USERS(user_id),
+    CONSTRAINT Chat_User_FK_Chat FOREIGN KEY (chat_id) REFERENCES CHATS(chat_id)
+);
+
+CREATE TABLE CHAT_MESSAGES (
+    message_id INT NOT NULL AUTO_INCREMENT,
+    chat_id INT NOT NULL,
+    sender_id INT NOT NULL,
+    CONSTRAINT Chat_Message_PK PRIMARY KEY (message_id),
+    CONSTRAINT Chat_Message_FK_Sender FOREIGN KEY (sender_id) REFERENCES USERS(user_id),
+    CONSTRAINT Chat_Message_FK_Chat FOREIGN KEY (chat_id) REFERENCES CHATS(chat_id)
+);
 
 CREATE TABLE TASKS (
     task_id INT NOT NULL AUTO_INCREMENT,
@@ -176,7 +203,7 @@ CREATE TABLE Cases_users (
     CONSTRAINT CU_FK_USER FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
 
-CREATE TABLE Documents_Users (
+CREATE TABLE Document_Users (
     document_id int not null,
     user_id int not null,
     CONSTRAINT DU_PK PRIMARY KEY (document_id, user_id),

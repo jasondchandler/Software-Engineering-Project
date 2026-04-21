@@ -13,7 +13,7 @@
         
         <script src="site.js" defer></script>
         <link rel="stylesheet" href = "style.css">
-        <link rel="icon" type="image/x-icon" href="">
+        <link rel="icon" type="image/x-icon" href="files/icon.png">
 
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" 
@@ -26,13 +26,56 @@
 
         <?php include "nav.php"; ?>
 
-        <div id="main" class = "main">
 
-            <div class = "container">
-                <h2> Content</h2>
-                <p><?php var_dump($_SESSION);?>
-                </p>
-                <br><br>
+
+                <section id="home" class="hero">
+  <h1>Powerful Legal Representation</h1>
+  <p>Relentless advocacy. Strategic thinking. Results that matter.</p>
+</section>
+
+<section id="practice" class="section">
+  <h2>Practice Areas</h2>
+  <div class="practice-areas">
+
+    <div class="card">
+      <img src="https://img.icons8.com/ios-filled/100/law.png" />
+      <h3>Workers' Compensation</h3>
+      <p>Recover benefits and wages quickly.</p>
+    </div>
+
+    <div class="card">
+      <img src="https://img.icons8.com/ios-filled/100/family.png" />
+      <h3>Matrimonial Law</h3>
+      <p>Divorce, custody, and family matters handled with care.</p>
+    </div>
+
+    <div class="card">
+      <img src="https://img.icons8.com/ios-filled/100/car-crash.png" />
+      <h3>Personal Injury</h3>
+      <p>Maximum compensation for your injuries.</p>
+    </div>
+
+    <div class="card">
+      <img src="https://img.icons8.com/ios-filled/100/handcuffs.png" />
+      <h3>Criminal Defense</h3>
+      <p>Protecting your rights and freedom.</p>
+    </div>
+
+  </div>
+</section>
+
+<section id="about" class="section">
+  <h2>About the Attorney</h2>
+  <p class="about">
+    We deliver strategic, results-driven legal representation tailored to each client.
+  </p>
+
+  <div class="cta">
+    <h2>Get Started Today</h2>
+    <p>Click below to sign up and begin your case.</p>
+    <button onclick="window.location.href='signup.php'">Sign Up</button>
+  </div>
+</section>
 
                 <?php 
                 
@@ -49,35 +92,8 @@
                 <br><br>
             </div>
 
-            <div class = "container d-flex justify-content-center mb-5">
-                <div class="row d-flex justify-content-center">
-                    <div class="col-4 d-flex justify-content-center columns m-2">
-                        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Tenetur temporibus qui dignissimos voluptatum, laboriosam laborum magni quibusdam fugit odio quidem ducimus! Quae iste ab maiores quas ratione quisquam repudiandae reprehenderit.
-                    </div>
-                    <div class="col-4 d-flex justify-content-center columns m-2">
-                        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Neque a quia ratione similique molestias? Enim ratione mollitia ipsam, quo cumque odio distinctio adipisci ducimus placeat et libero, sint, hic reprehenderit?
-                    </div>
-                    <div class="col-4 d-flex justify-content-center columns m-2">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Fuga amet, quas quis esse nostrum eligendi qui nemo exercitationem ut eum minima tenetur voluptatibus impedit iusto debitis vel delectus temporibus alias.
-                    </div>
-                </div>
-            </div>
-
-            <div class="info1">
-
-            <h1>Content Class #1</h1>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ea minima fuga explicabo neque labore, consequatur est optio mollitia consectetur ipsum esse! Maiores a nihil eius repellendus. Rerum totam sapiente aliquid.</p>
-
-            </div>
-
-            <div class="info2">
-
-            <h1>Content Class #2</h1>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ea minima fuga explicabo neque labore, consequatur est optio mollitia consectetur ipsum esse! Maiores a nihil eius repellendus. Rerum totam sapiente aliquid.</p>
-
-            </div>
-
-        </div>
+   <?php
+include "footer.php"; ?>
 
     </body>
 

@@ -13,7 +13,7 @@
       
     <script src="site.js" defer></script>
     <link rel="stylesheet" href = "style.css">
-    <link rel="icon" type="image/x-icon" href="">
+    <link rel="icon" type="image/x-icon" href="files/icon.png">
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" 
@@ -26,9 +26,7 @@
 
   <?php 
     include "nav.php";?>
-
-
-  <div class = "main">
+<div class="container">
 
     <div class="nav">
       <div>
@@ -143,7 +141,6 @@ $stmt->close();
 
                     <div class="modal-body">
                       <form action="document_upload_action.php" method="POST" enctype= "multipart/form-data">
-          <input type="hidden" name="meeting_id" value="<?= $row['meeting_id']; ?>">
 
           <?php
           if (!empty($_SESSION["document_upload_error"])) {
@@ -173,8 +170,6 @@ $stmt->close();
                   </option>
               <?php endwhile; ?>
           </select>
-
-          <input type="hidden" name="document_id" value="<?= $row['document_id']; ?>">
 
 	  <label class="form-label">Describe the file:</label>
           <input type="text" class="form-control mb-4" name="description">
@@ -328,13 +323,14 @@ $search = $_GET["search"] ?? "";
                   </select>
                 </div>
 
-                <button type="submit" class="btn btn-primary form-control">Assign Task</button>
+                <input type="hidden" name="document_id" value="<?php echo $row['document_id']; ?>">
+
+                <button type="submit" class="btn btn-primary form-control">Give access</button>
               </form>
       </div>
     </div>
   </div>
-</div> 
-
+</div>
             <div class="modal fade" id="deleteDocumentForm<?= $row['document_id'] ?>" 
      data-edit-modal="<?php echo $show_edit_modal ? 'true' : 'false'; ?>" 
      tabindex="-1" aria-hidden="true">

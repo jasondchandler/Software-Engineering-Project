@@ -1,9 +1,154 @@
 @import url('https://fonts.googleapis.com');
-* {
-    box-sizing: border-box;
-    font-family: Arial, Helvetica, sans-serif;
-    text-align: justify;
+* { box-sizing: border-box; scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+      color: #ffffff;
+    }
+
+    header {
+      top: 0;
+      backdrop-filter: blur(10px);
+      background: rgba(0,0,0,0.6);
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      z-index: 1000;
+    }
+
+    .logo {
+      font-size: 26px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-decoration: none;
+      color: #ffffff;
+    }
+
+
+
+    nav a {
+      color: #ccc;
+      margin-left: 25px;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+
+    nav a:hover {
+      color: #ffffff;
+    }
+
+    .hero {
+      padding: 120px 20px;
+      text-align: center;
+      background: url('https://images.unsplash.com/photo-1602539784414-3c748f7f7f50?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat, radial-gradient(circle at top, #222, #0f0f0f);
+    }
+
+    .hero h1 {
+      font-size: 48px;
+      margin-bottom: 15px;
+      background: linear-gradient(to right, #ffffff, #bbbbbb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 18px;
+      max-width: 650px;
+      margin: auto;
+      color: #ddd;
+    }
+
+    .section {
+      padding: 80px 20px;
+      max-width: 1100px;
+      margin: auto;
+      position: relative;
+    }
+
+    .section h2 {
+      text-align: center;
+      margin-bottom: 50px;
+      font-size: 32px;
+    }
+
+    .practice-areas {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 30px;
+    }
+
+    .card {
+      padding: 25px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+      transition: 0.3s;
+      text-align: center;
+    }
+
+    .card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.7);
+    }
+
+.card img {
+  display: block;
+  margin: 0 auto 15px auto;
+  width: 60px;
+  filter: invert(1);
 }
+
+.card h3 {
+  color: #ffffff;
+}
+
+    .card p { color: #bbb; font-size: 14px; }
+
+    .about {
+      text-align: center;
+      color: #bbb;
+      line-height: 1.6;
+      max-width: 800px;
+      margin: auto;
+      background: url('https://images.unsplash.com/photo-1603032704510-8a5c5c9a4084?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;
+      padding: 60px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .cta {
+      margin-top: 60px;
+      text-align: center;
+      padding: 70px 20px;
+      background: linear-gradient(135deg, #ffffff, #cccccc);
+      color: #000;
+      border-radius: 30px;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta button {
+      margin-top: 15px;
+      background: #000;
+      color: #fff;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 30px;
+      cursor: pointer;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: #777;
+      font-size: 14px;
+    }
 
 html {
     margin: 0;
@@ -72,11 +217,12 @@ iframe{
     text-decoration: underline;
 }
 
-.link li a .active {
-    color: black;
-    text-decoration-color: black; 
-	background-color: #343a40;
+.active {
+    color: #ffffff;
+    
 }
+
+.modal {color:#000;}
 
 .sidebar {
     width: 200px;
@@ -154,28 +300,10 @@ iframe{
 }
 
 
-h2 {
-    color: #212529;
-    position: relative;
-    text-align: center;
-}
+
 
 .columns {
     border: 5px solid #7393b3;
-}
-
-
-footer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 75px;
-    width: 100%;
-    background-color: #7393b3;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    border-top: 5px solid #000000;
 }
 
 .form_container {
@@ -200,6 +328,7 @@ footer {
 .stat, .meeting{
     background:#fff;
     border:1px solid #ddd;
+    color: black;
     border-radius:14px;
     padding:16px;
     margin-bottom: 14px;

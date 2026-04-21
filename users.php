@@ -8,12 +8,14 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <link rel="icon" type="image/x-icon" href="files/icon.png">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
       
     <script src="site.js" defer></script>
     <link rel="stylesheet" href = "style.css">
-    <link rel="icon" type="image/x-icon" href="">
+    <link rel="icon" type="image/x-icon" href="files/icon.png">
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" 
@@ -26,8 +28,7 @@
 
   <?php include "nav.php"; ?>
 
-
-  <div class = "main">
+<div class="container">
 
     <div class="nav">
       <div>
@@ -110,7 +111,7 @@
             <?php 
             if (isset($row["phone"])) {
 
-              echo "<span>Phone:";
+              echo "<span>Phone: ";
               echo sprintf("(%s) %s-%s",
                     substr($row["phone"], 0, 3),
                     substr($row["phone"], 3, 3),
@@ -121,7 +122,7 @@
             
             if (isset($row["address"])) {
 
-              echo "<span>Address:";
+              echo "<span>Address: ";
               echo $row["address"];
               echo "</span><br>";
             }
@@ -137,7 +138,7 @@
                         <option value="client" <?php if($row['role'] === 'client') echo 'selected'; ?>>Client</option>
                         <option value="paralegal" <?php if($row['role'] === 'paralegal') echo 'selected'; ?>>Paralegal</option>
                     </select>
-                    <button type="submit" class="form-control btn btn-primary mt-0">Update</button>
+                    <button type="submit" class="form-control btn btn-primary mt-2">Update</button>
             </form>
 
             </div>
