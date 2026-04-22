@@ -195,6 +195,14 @@ CREATE TABLE DOCUMENTS (
     CONSTRAINT D_Case_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
 );
 
+CREATE TABLE DOCUMENT_USERS (
+    document_id INT NOT NULL,
+    user_id INT NOT NULL,
+    CONSTRAINT Document_Users_PK PRIMARY KEY (document_id, user_id),
+    CONSTRAINT Document_Users_Document_FK FOREIGN KEY (document_id) REFERENCES DOCUMENTS(document_id),
+    CONSTRAINT Document_Users_User_FK FOREIGN KEY (user_id) REFERENCES USERS(user_id)
+);
+
 CREATE TABLE Cases_users (
     case_id int not null,
     user_id int not null,
