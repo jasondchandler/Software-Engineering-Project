@@ -359,8 +359,100 @@ $search = $_GET["search"] ?? "";
     <p>No documents found.</p>
   <?php endif; ?>
   </div>
-
-
-
 </div>
+<hr>
+<h1>Your Documents</h1>
+
+	<?php
+	$sql = "SELECT * FROM documents ORDER BY document_id DESC";
+	$result = $conn->query($sql);
+	?>
+
+<?php if ($result && $result->num_rows > 0): ?>
+    <?php while ($row = $result->fetch_assoc()): ?>
+        <div class="meeting">
+            <span>Name: <?php echo h($row["name"]); ?></span><br>
+            <span>Description: <?php echo h($row["description"]); ?></span><br>
+            <span>
+                File:
+                <a href="files/<?php echo rawurlencode($row["path"]); ?>" target="_blank">
+                    View
+                </a>
+            </span><br>
+
+            <?php if ($_SESSION["role"] === "admin"): ?>
+                <hr>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#grant<?php echo $row['document_id']; ?>">
+                        Grant Access
+                    </button>
+
+                    <button class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#remove<?php echo $row['document_id']; ?>">
+                        Remove Access
+                    </button>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- GRANT MODAL -->
+        <div class="modal fade" id="grant<?php echo $row['document_id']; ?>">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5>Grant Access</h5>
+                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <form action="add_document_user.php" method="POST">
+                            <input type="hidden" name="document_id" value="<?php echo $row['document_id']; ?>">
+
+                            <select name="user_id" class="form-control mb-2" required>
+                                <?php
+                                $users = $conn->query("SELECT user_id, firstname, lastname FROM users");
+                                while ($u = $users->fetch_assoc()) {
+                                    echo "<option value='{$u["user_id"]}'>" .
+                                        h($u["firstname"] . " " . $u["lastname"]) .
+                                        "</option>";
+                                }
+                                ?>
+                            </select>
+
+                            <button class="btn btn-primary w-100">Grant</button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- REMOVE MODAL -->
+        <div class="modal fade" id="remove<?php echo $row['document_id']; ?>">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5>Remove Access</h5>
+                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <form action="remove_document_user.php" method="POST">
+                            <input type="hidden" name="document_id" value="<?php echo $row['document_id']; ?>">
+
+                            <input type="number" name="user_id" class="form-control mb-2" placeholder="User ID">
+
+                            <button class="btn btn-danger w-100">Remove</button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    <?php endwhile; ?>
+<?php else: ?>
+    <p>No documents found.</p>
+<?php endif; ?>	
 </body>
