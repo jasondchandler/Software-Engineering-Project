@@ -365,3 +365,41 @@ iframe{
 @media(max-width:800px){
     .stats{grid-template-columns:1fr;}
 }
+
+.message {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.message.left {
+  justify-content: flex-start;
+}
+
+.message.right {
+  justify-content: flex-end;
+}
+
+.bubble {
+  max-width: 70%;
+  padding: 10px 14px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.4;
+  position: relative;
+}
+
+.message.left .bubble {
+  background: #D3D3D3;
+  color: #000;
+  border-bottom-left-radius: 4px;
+}
+
+.message.right .bubble {
+  background: #ffffff;
+  color: #000;
+  border-bottom-right-radius: 4px;
+}
+
+.bubble {
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}

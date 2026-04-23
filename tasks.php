@@ -110,6 +110,16 @@ if (allow("edit-task")) {
                   <textarea name="description" class="form-control" required></textarea>
                 </div>
 
+                <div class="mb-3">
+                  <label class="form-label">Date:</label>
+                  <input type="date" class="form-control" name="date" required>
+              </div>
+
+              <div class="mb-3">
+                  <label class="form-label">Time:</label>
+                  <input type="time" class="form-control" name="time" required>
+              </div>
+
                 <div class="mb-3 form-check">
                   <input type="checkbox" class="form-check-input" id="digital" name="can_complete_digitally" value="1">
                   <label class="form-check-label" for="digital">
@@ -245,6 +255,7 @@ $result = $stmt->get_result();
                 <span class="name"><?php echo h($row["firstname"] . " " . $row["lastname"] . " | " . $row["email"]); ?></span><br>
             <?php endif; ?>
             <span>Description: <?php echo h($row["description"]); ?></span><br>
+            <span>Due: <?php echo h($row["due"]); ?></span><br>
             <span>Status: <?php echo h($row["status"]); ?></span><br>
             <span>Digital Completion: <?php echo $row["can_complete_digitally"] ? "Yes" : "No"; ?></span><br>
             <span>Created: <?php echo h($row["created_at"]); ?></span><br>

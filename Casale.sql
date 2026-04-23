@@ -49,7 +49,8 @@ INSERT INTO PERMISSIONS (name) VALUES
     ('view-documents'),
     ('upload-document'),
     ('view-chats'),
-    ('create-chat')
+    ('create-chat'),
+    ('view-task')
     ;
 
 CREATE TABLE ROLE_PERMISSIONS (
@@ -76,6 +77,7 @@ WHERE name IN ('view-chats', 'view-meetings', 'view-cases', 'view-documents', 'v
 
 CREATE TABLE CHATS (
     chat_id INT NOT NULL AUTO_INCREMENT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     CONSTRAINT Chat_PK PRIMARY KEY (chat_id)
 );
 
@@ -91,6 +93,8 @@ CREATE TABLE CHAT_MESSAGES (
     message_id INT NOT NULL AUTO_INCREMENT,
     chat_id INT NOT NULL,
     sender_id INT NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT Chat_Message_PK PRIMARY KEY (message_id),
     CONSTRAINT Chat_Message_FK_Sender FOREIGN KEY (sender_id) REFERENCES USERS(user_id),
     CONSTRAINT Chat_Message_FK_Chat FOREIGN KEY (chat_id) REFERENCES CHATS(chat_id)
@@ -211,13 +215,6 @@ CREATE TABLE Cases_users (
     CONSTRAINT CU_FK_USER FOREIGN KEY (user_id) REFERENCES Users(user_id)
 );
 
-CREATE TABLE Document_Users (
-    document_id int not null,
-    user_id int not null,
-    CONSTRAINT DU_PK PRIMARY KEY (document_id, user_id),
-    CONSTRAINT DU_FK_DOC FOREIGN KEY (document_id) REFERENCES Documents(document_id),
-    CONSTRAINT DU_FK_USER FOREIGN KEY (user_id) REFERENCES Users(user_id)
-);
 
 /**************
 Run this to give an account admin role
@@ -226,28 +223,3 @@ change the where clause as needed
 UPDATE USERS
 SET role = 'admin'
 WHERE user_id = 1;  
-
-
-
-
-
-
-
-
-
-
-
-
-SELECT case_id, 'hour logged' AS type, hours AS value, work_date AS activity_date
-FROM case_hours
-
-UNION ALL
-
-SELECT case_id, 'fee added' AS type, amount AS value, date_charged AS activity_date
-FROM case_fee
-
-ORDER BY activity_date DESC;
-
-ALTER TABLE cases ADD COLUMN assigned_to INT NULL;
-
-ALTER TABLE appointments ADD COLUMN client_email VARCHAR(190) NULL AFTER client_name;

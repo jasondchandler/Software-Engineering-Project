@@ -7,18 +7,24 @@
     <header>
   <a class="logo" href="index.php">⚖ Charles Casale Law</a>
   <nav>
-    <a class="<?php echo ($current == "meetings.php") ? "active" : ""; ?>" href = "meetings.php">Meetings</a>
-
+  <?php 
+        if (allow("view-meetings")) {
+            echo '<a class="' . ($current == "meetings.php" ? "active" : "") . '" href="meetings.php">Meetings</a>';
+        }
+    ?>
     <?php 
         if (allow("view-cases")) {
             echo '<a class="' . ($current == "cases.php" ? "active" : "") . '" href="cases.php">Cases</a>';
         }
     ?>
 
-	<a class="<?php echo ($current == "tasks.php") ? "active" : ""; ?>" href = "tasks.php">Tasks</a>
+    <?php 
+        if (allow("view-tasks")) {
+            echo '<a class="' . ($current == "tasks.php" ? "active" : "") . '" href="tasks.php">Tasks</a>';
+        }
+    ?>
 
-	<a class="<?php echo ($current == "Documents.php" || $current == "documents.php") ? "active" : ""; ?>" href = "Documents.php">Documents</a>
-
+	
 <?php 
         if (allow("view-documents")) {
             echo '<a class="' . ($current == "Documents.php" ? "active" : "") . '" href="Documents.php">Documents</a>';
@@ -39,7 +45,8 @@
 
                         <?php 
                         if (!isset($_SESSION["user_id"])) {
-                            echo '<a class="" href="login.php">Log in</a>';
+                            echo '<a class="" href="login.php">Log in</a>         ';
+                            echo '<a class="" href="signup.php">Sign up</a>';
                         }
 
                         else {

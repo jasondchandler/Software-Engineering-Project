@@ -24,7 +24,7 @@
 
     <body>
 
-        <?php include "nav.php"; ?>
+        <?php include "nav.php"; //var_dump($_SESSION);?>
 
 
 

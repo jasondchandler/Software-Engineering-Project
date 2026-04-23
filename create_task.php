@@ -16,6 +16,9 @@ if ($_SESSION["role"] !== "admin") {
 
 $user_id = $_POST["user_id"];
 $description = trim($_POST["description"]);
+$date = $_POST["date"];
+$time = $_POST["time"];
+$datetime = $date . ' ' . $time . ':00';
 $can_complete_digitally = isset($_POST["can_complete_digitally"]) ? 1 : 0;
 
 if (empty($user_id) || empty($description)) {
@@ -24,11 +27,11 @@ if (empty($user_id) || empty($description)) {
     exit;
 }
 
-$sql = "INSERT INTO TASKS (user_id, description, can_complete_digitally)
-        VALUES (?, ?, ?)";
+$sql = "INSERT INTO TASKS (user_id, description, can_complete_digitally, due)
+        VALUES (?, ?, ?, ?)";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("isi", $user_id, $description, $can_complete_digitally);
+$stmt->bind_param("isis", $user_id, $description, $can_complete_digitally, $datetime);
 
 if ($stmt->execute()) {
     $_SESSION["task_success"] = "Task assigned successfully.";
