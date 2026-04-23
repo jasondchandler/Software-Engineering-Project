@@ -85,6 +85,63 @@ $show_edit_modal = !empty($_SESSION["edit_case_error"]);
         </button>
     <?php endif; ?>
 
+    <div class="modal fade" id="createCaseForm" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Create Case</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="create_case_action.php" method="POST">
+                                    <label class="form-label">Case Title:</label><br>
+                                    <input class="form-control mb-3" type="text" name="title" maxlength="50" required>
+
+                                    <label class="form-label">Court:</label><br>
+                                    <input class="form-control mb-3" type="text" name="court" maxlength="50" required>
+
+                                    <label class="form-label">Optionally add a user:</label>
+                                    <select name="user_id" class="form-control mb-3">
+                                    <option value="none">None</option>
+                                    <?php
+                                    $usersResult = $conn->query("SELECT user_id, firstname, lastname, email, role FROM users WHERE role IN ('client', 'paralegal')");
+                                    while ($userRow = $usersResult->fetch_assoc()) {
+                                    echo '<option value="' . $userRow["user_id"] . '">'
+                                    . h($userRow["firstname"] . ' ' . $userRow["lastname"] . ' | ' . $userRow["email"] . ' | ' . $userRow["role"])
+                                    . '</option>';
+                                    }
+                                    ?>
+                                    </select>
+
+                                    <label class="form-label">Case Type:</label><br>
+                                    <input class="form-control mb-3" type="text" name="type" maxlength="20" required>
+
+                                    <label class="form-label">Filing Date:</label><br>
+                                    <input class="form-control mb-3" type="date" name="filing_date" required>
+
+                                    <label class="form-label">Status:</label><br>
+                                    <select class="form-control mb-3" name="status" required>
+                                        <option value="">--Select Status--</option>
+                                        <option value="Open">Open</option>
+                                        <option value="Closed">Closed</option>
+                                        <option value="Pending">Pending</option>
+                                        <option value="Appeal">Appeal</option>
+                                    </select>
+
+                                    <div class="mb-3 form-check">
+                                        <input type="checkbox" class="form-check-input" id="open_retainer" name="open_retainer" value="1">
+                                        <label class="form-check-label" for="open_retainer">
+                                            Open Retainer ($3,000)
+                                        </label>
+                                </div>
+
+                                    <button type="submit" class="btn btn-primary form-control">Create Case</button>
+                                </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
     <div class="search_container"> 
         <form class="mb-2" method="GET">
             <input class="form-control mb-3" type="text" name="search" placeholder="Enter search term..." value="<?php echo h($_GET['search'] ?? ''); ?>">
@@ -248,6 +305,7 @@ $show_edit_modal = !empty($_SESSION["edit_case_error"]);
             echo "</div>";
             ?>
 
+
             <div class="modal fade" id="editCaseForm<?= $row['case_id'] ?>" 
                  data-edit-modal="<?php echo $show_edit_modal ? 'true' : 'false'; ?>" 
                  tabindex="-1" aria-hidden="true">
@@ -280,6 +338,7 @@ $show_edit_modal = !empty($_SESSION["edit_case_error"]);
                             <option value="Pending" <?php if($row['status']=='Pending') echo 'selected'; ?>>Pending</option>
                             <option value="Appeal" <?php if($row['status']=='Appeal') echo 'selected'; ?>>Appeal</option>
                         </select><br>
+
 
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary flex-fill">Update Case</button>
