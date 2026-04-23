@@ -15,7 +15,6 @@ function send_client_email(string $to, string $toName, string $subject, string $
         $mail->Host       = "smtp.gmail.com";
         $mail->SMTPAuth   = true;
 
-        // FILL THESE LOCALLY ONLY (do NOT commit)
         $mail->Username   = "";
         $mail->Password   = "";
 
