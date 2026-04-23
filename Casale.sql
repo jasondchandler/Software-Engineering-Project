@@ -165,11 +165,11 @@ CREATE TABLE UNAVAILABLE_TIMES (
 CREATE TABLE case_fee (
     fee_id INT AUTO_INCREMENT PRIMARY KEY,
     case_id INT NOT NULL,
-    fee_type VARCHAR(50) not null,
-	description varchar(200) null, 
+    fee_type VARCHAR(50) NOT NULL,
+    description VARCHAR(200) NULL,
     amount DECIMAL(10,2) NOT NULL,
     date_charged DATE,
-    CONSTRAINT CF_Case_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
+    FOREIGN KEY (case_id) REFERENCES cases(case_id)
 );
 
 CREATE TABLE case_hours (
