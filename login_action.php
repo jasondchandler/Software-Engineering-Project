@@ -19,8 +19,8 @@ if ($row && password_verify($password, $row["password"])) {
 
 	$sql = "
     SELECT p.name
-    FROM PERMISSIONS p
-    JOIN ROLE_PERMISSIONS rp 
+    FROM permissions p
+    JOIN role_permissions rp 
         ON p.permission_id = rp.permission_id
     WHERE rp.role_name = ?
     ";
