@@ -56,7 +56,7 @@ $phone = $phone ? $phone : NULL;
 $address = $address ? $address : NULL;
 
 // Prepare SQL statement
-$stmt = $conn->prepare("INSERT INTO USERS (email, password, firstname, lastname, phone, address)
+$stmt = $conn->prepare("INSERT INTO users (email, password, firstname, lastname, phone, address)
                         VALUES (?, ?, ?, ?, ?, ?)");
 
 $stmt->bind_param("ssssss", $email, $password_hash, $firstname, $lastname, $phone, $address);
@@ -74,8 +74,8 @@ if ($stmt->execute()) {
 
 	$sql = "
     SELECT p.name
-    FROM PERMISSIONS p
-    JOIN ROLE_PERMISSIONS rp 
+    FROM permissions p
+    JOIN role_permissions rp 
         ON p.permission_id = rp.permission_id
     WHERE rp.role_name = ?
 ";
