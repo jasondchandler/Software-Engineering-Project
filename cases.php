@@ -60,19 +60,19 @@ $show_edit_modal = !empty($_SESSION["edit_case_error"]);
     </div>
 
     <div class="stats mb-3">
-        <div class="stat">
+        <div class="stat text-center">
             <div class="small">Open Cases</div>
             <div class="num fs-4"><?php echo $ongoingCount; ?></div>
             <div class="small">In progress</div>
         </div>    
     
-        <div class="stat">
+        <div class="stat text-center">
             <div class="small">Pending Cases</div>
             <div class="num fs-4"><?php echo $pendingCount; ?></div>
             <div class="small">Awaiting review</div>
         </div>
 
-        <div class="stat">
+        <div class="stat text-center">
             <div class="small">Closed Cases</div>
             <div class="num fs-4"><?php echo $closedCount; ?></div>
             <div class="small">Completed</div>
@@ -195,6 +195,7 @@ $show_edit_modal = !empty($_SESSION["edit_case_error"]);
         ?>
 
         <hr>
+        <br>
         <h1>Your cases:</h1>
 
         <div class="search_container">
@@ -202,13 +203,14 @@ $show_edit_modal = !empty($_SESSION["edit_case_error"]);
                 <?php if (!empty($_GET['search'])): ?>
                     <input type="hidden" name="search" value="<?php echo h($_GET['search']); ?>">
                 <?php endif; ?>
-                    <div class = "filter_row"> <label>
+
+                <label>
                     <input type="checkbox" name="status" value="1" <?php if(!empty($_GET['status'])) echo 'checked'; ?>> Status
                 </label>
                 <label>
                     <input type="checkbox" name="type" value="1" <?php if(!empty($_GET['type'])) echo 'checked'; ?>> Type
                 </label>
-                <button type="submit" class="btn btn-primary w-100 mt-2">Sort cases</button></div>
+                <button type="submit" class="btn btn-primary w-100 mt-2">Sort cases</button>
             </form>
         </div>
     </div>
@@ -281,17 +283,80 @@ $show_edit_modal = !empty($_SESSION["edit_case_error"]);
             $feeStmt->close();
 
             echo "<div class='meeting'>";
-            echo "<div class='task-header'>";
-            echo "<span class='name'>Title: ".h($row['title'])."</span>";
-            echo "<span class='status status-" . strtolower($row["status"]) . "'>" .
-            htmlspecialchars($row["status"]) .
-            "</span></div>";
+            echo "<span class='name'>Title: ".h($row['title'])."</span><br>";
             echo "<span>User: ".($row['firstname'] ? h($row['firstname']." ".$row['lastname']) : "Unassigned")."</span><br>";
             echo "<span>Court: ".h($row['court'])."</span><br>";
             echo "<span>Type: ".h($row['type'])."</span><br>";
             echo "<span>Filing date: ".h($row['filing_date'])."</span><br>";
             echo "<span>Status: ".h($row['status'])."</span><br>";
             echo "<span>Total Fees: $".number_format((float)$totalFees, 2)."</span><br><hr>";
+
+
+            $retainerStmt = $conn->prepare("
+                SELECT value FROM case_retainers WHERE case_id = ?
+            ");
+            $retainerStmt->bind_param("i", $row["case_id"]);
+            $retainerStmt->execute();
+            $retainerResult = $retainerStmt->get_result();
+            $retainerRow = $retainerResult->fetch_assoc();
+            $retainerStmt->close();
+
+            $retainerValue = $retainerRow ? (float)$retainerRow["value"] : 0;
+
+
+            $totalHoursStmt = $conn->prepare("
+                SELECT COALESCE(SUM(hours), 0) AS total_hours
+                FROM case_hours
+                WHERE case_id = ?
+            ");
+            $totalHoursStmt->bind_param("i", $row["case_id"]);
+            $totalHoursStmt->execute();
+            $totalHoursResult = $totalHoursStmt->get_result();
+            $totalHoursRow = $totalHoursResult->fetch_assoc();
+            $totalHoursStmt->close();
+
+            $totalHours = (float)$totalHoursRow["total_hours"];
+
+            $hourlyRate = 100;
+            $hoursCost = $totalHours * $hourlyRate;
+            $remainingRetainer = $retainerValue - $totalFees - $hoursCost;
+            ?>
+
+            <?php if ($retainerValue > 0): ?>
+                <span>Retainer: $<?php echo number_format($retainerValue, 2); ?></span><br>
+                <span>Fees Used: $<?php echo number_format($totalFees, 2); ?></span><br>
+                <span>Hours Used: $<?php echo number_format($hoursCost, 2); ?></span><br>
+                <span><strong>Remaining Retainer: $<?php echo number_format($remainingRetainer, 2); ?></strong></span><br>
+            <?php else: ?>
+                <span>No retainer opened</span><br>
+            <?php endif;
+
+            $hoursStmt = $conn->prepare("
+                SELECT work_date, hours, description
+                FROM case_hours
+                WHERE case_id = ?
+                ORDER BY work_date DESC
+            ");
+            $hoursStmt->bind_param("i", $row["case_id"]);
+            $hoursStmt->execute();
+            $hoursResult = $hoursStmt->get_result();
+            ?>
+
+            <span>Logged Hours:</span><br>
+
+            <?php if ($hoursResult->num_rows > 0): ?>
+            <?php while ($hour = $hoursResult->fetch_assoc()): ?>
+            <span>
+                - <?php echo h($hour["work_date"]); ?> |
+                <?php echo h($hour["hours"]); ?> hrs |
+                <?php echo h($hour["description"]); ?>
+            </span><br>
+            <?php endwhile; ?>
+            <?php else: ?>
+            <span>- No hours logged</span><br>
+            <?php endif; ?>
+
+            <?php $hoursStmt->close(); 
 
             echo "<div class='d-flex gap-2 flex-wrap'>";
             if (allow("edit-case")) {
@@ -302,6 +367,10 @@ $show_edit_modal = !empty($_SESSION["edit_case_error"]);
             }
             if ($_SESSION["role"] === "admin") {
                 echo '<button class="btn btn-dark flex-fill" data-bs-toggle="modal" data-bs-target="#addFee' . $row['case_id'] . '">Add Fee</button>';
+            }
+            if ($_SESSION["role"] === "admin") {
+                echo '<button class="btn btn-secondary flex-fill" data-bs-toggle="modal" data-bs-target="#logHours' . $row['case_id'] . '">
+                Log Hours </button>';
             }
             echo "</div>";
             echo "</div>";
@@ -401,11 +470,42 @@ $show_edit_modal = !empty($_SESSION["edit_case_error"]);
                         <input type="date" name="date_charged" class="form-control"><br>
 
                         <button type="submit" class="btn btn-primary form-control">Add Fee</button>
+                        
                     </form>
                   </div>
                 </div>
               </div>
             </div>
+            
+                <div class="modal fade" id="logHours<?= $row['case_id'] ?>" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+
+                            <div class="modal-header">
+                                <h5 class="modal-title">Log Case Hours</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+
+                            <div class="modal-body">
+                                <form action="create_case_hours.php" method="POST">
+
+                                    <input type="hidden" name="case_id" value="<?= $row['case_id'] ?>">
+
+                                    <label>Work Date:</label>
+                                    <input type="date" name="work_date" class="form-control mb-2" required>
+
+                                    <label>Hours:</label>
+                                    <input type="number" name="hours" class="form-control mb-2" step="0.25" min="0.25" required>
+
+                                    <label>Description:</label>
+                                    <textarea name="description" class="form-control mb-2" required></textarea>
+
+                                    <button type="submit" class="btn btn-primary w-100">Log Hours</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             <?php endif; ?>
 
             <?php
@@ -418,7 +518,5 @@ $show_edit_modal = !empty($_SESSION["edit_case_error"]);
     $conn->close();
     ?>
 </div>
-  <?php
-include "footer.php"; ?>
 </body>
 </html>
