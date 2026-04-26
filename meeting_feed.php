@@ -10,6 +10,7 @@
             ?>
 <div class="search_container">
 <form method="GET" action="">
+    <div class="filter_row">
         <label>
             <input type="checkbox" name="hide_pending" value="1" <?php if(!empty($_GET['hide_pending'])) echo 'checked'; ?>> Hide Pending
         </label>
@@ -20,6 +21,7 @@
             <input type="checkbox" name="hide_complete" value="1" <?php if(!empty($_GET['hide_complete'])) echo 'checked'; ?>> Hide Completed
         </label>
         <button type="submit" class="btn btn-primary w-100 mt-2">Apply Filter</button>
+</div>
     </form>
         </div>
 <?php  
@@ -72,9 +74,14 @@ elseif ($_SESSION["role"] === "admin") {
 
   <?php $count=1; if ($result && $result->num_rows > 0): ?>
     <?php while ($row = $result->fetch_assoc()): ?>
-        <div class="card">
-            <span>Meeting #<?php echo $count; ?></span><br>
-            <span>Status: <?php echo $row["status"];?></span> <br>
+        <div class="meeting">
+            <div class="task-header"> 
+            <strong>Meeting #<?php echo $count; ?></strong>
+            <span class="status status-<?php echo strtolower($row["status"]); ?>">
+            <?php echo htmlspecialchars($row["status"]); ?>
+            </span> 
+
+          </div>
             <span>Time: 
               <?php  
                 $timezone = new DateTimeZone("America/New_York");
@@ -116,9 +123,8 @@ elseif ($_SESSION["role"] === "admin") {
               <?php 
 
 
-              if (allow("confirm-meetings") && $row["status"] === "pending") {
-                echo '<button class="btn btn-success flex-fill" data-bs-toggle="modal" data-bs-target="#confirmMeeting' . $row['meeting_id'] . '">Confirm</button>';
-                echo "<br>";
+              if ($_SESSION["role"] === "admin" && $row["status"] === "pending") {
+                echo '<button class="btn btn-success flex-fill m-0" data-bs-toggle="modal" data-bs-target="#confirmMeeting' . $row['meeting_id'] . '">Confirm</button>';;
               }
               elseif ($_SESSION["role"] === "admin" && $row["status"] === "confirmed") {
                 echo '<button class="btn btn-success flex-fill" data-bs-toggle="modal" data-bs-target="#completeMeeting' . $row['meeting_id'] . '">Complete</button>';

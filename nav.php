@@ -39,7 +39,7 @@
 
     <?php 
         if (allow("view-chats")) {
-            echo '<a class="' . ($current == "chats.php" ? "active" : "") . '" href="chats.php">Chats</a>';
+            echo '<a class="' . ($current == "messages.php" ? "active" : "") . '" href="messages.php">Conversations</a>';
         }
     ?>
 

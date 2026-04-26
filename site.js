@@ -52,7 +52,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-function showFrame(id) {
+function showFrame(id, btn) {
     var frame = document.getElementById('document' + id);
-    frame.style.display = 'block';
+
+    if (frame.style.display === 'none' || frame.style.display === '') {
+        frame.style.display = 'block';
+        btn.textContent = 'Hide document';
+    } else {
+        frame.style.display = 'none';
+        btn.textContent = 'Show document here';
+    }
 }

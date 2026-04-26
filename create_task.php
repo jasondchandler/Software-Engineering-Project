@@ -27,7 +27,7 @@ if (empty($user_id) || empty($description)) {
     exit;
 }
 
-$sql = "INSERT INTO TASKS (user_id, description, can_complete_digitally, due)
+$sql = "INSERT INTO tasks (user_id, description, can_complete_digitally, due)
         VALUES (?, ?, ?, ?)";
 
 $stmt = $conn->prepare($sql);

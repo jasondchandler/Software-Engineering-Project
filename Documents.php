@@ -78,7 +78,7 @@ $stmt->close();
   ?>
 
     <div class="stats  mb-3">
-            <div class="stat text-center">
+            <div class="stat">
             <div class="small">Document count</div>
             <div class="num fs-4"><?php echo $documentCount; ?></div>
             <div class="small">In system</div>
@@ -172,10 +172,10 @@ $stmt->close();
           </select>
 
 	  <label class="form-label">Describe the file:</label>
-          <input type="text" class="form-control mb-4" name="description">
+          <input type="text" class="form-control mb-2" name="description">
 
             <hr>
-	  <button type="submit" class="form-control btn btn-primary mt-4">Upload</button>
+	  <button type="submit" class="form-control btn btn-primary mt-2">Upload</button>
         </form>
                     </div>
 
@@ -262,8 +262,12 @@ $search = $_GET["search"] ?? "";
               ?>
             </span><br>
 
-            <iframe style="display:none;" id="document<?php echo $count;?>"class="w-100" src="<?php echo "files/".$row["path"];?>"> </iframe><br>
-            <button class="btn btn-dark w-100"onclick="showFrame(<?php echo $count;?>)">Show document here</button>
+            <iframe style="display:none;" id="document<?php echo $count; ?>" class="w-100" src="<?php echo "files/".$row["path"]; ?>"></iframe><br>
+
+            <button class="btn btn-dark w-100"
+                    onclick="showFrame(<?php echo $count; ?>, this)">
+                Show document here
+            </button>
             
             <br>
             <a class="btn btn-dark w-100 mt-3"href="<?php echo "files/".$row["path"];?>" target="_blank">
@@ -288,113 +292,31 @@ $search = $_GET["search"] ?? "";
     echo '<div class="d-flex gap-2">';
     echo '<button class="btn btn-primary flex-fill" 
             data-bs-toggle="modal" 
-            data-bs-target="#addUser' . $row['document_id'] . '">
+            data-bs-target="#grant' . $row['document_id'] . '">
             Add user to document
           </button>';
+
+      $userResult = $conn->query("
+    SELECT * 
+    FROM document_users du 
+    JOIN users u ON du.user_id = u.user_id 
+    WHERE document_id = " . $row['document_id']);
+
+    $rowCount = $userResult->num_rows;
+
+    if ($rowCount > 0) {
+      echo '<button class="btn btn-danger flex-fill" 
+            data-bs-toggle="modal" 
+            data-bs-target="#remove' . $row['document_id'] . '">
+            Remove user from document
+          </button>';
+    }
     echo '</div>';
 }
 
                 ?>
+    
 
-                <div class="modal fade" id="addUser<?= $row['document_id'] ?>" 
-     data-edit-modal="<?php echo $show_edit_modal ? 'true' : 'false'; ?>" 
-     tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Select a user to add: </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form action="add_user_document.php" method="POST">
-
-                <div class="mb-3">
-                  
-                  <label class="form-label">Assign To:</label>
-                  <select name="user_id" class="form-control" required>
-                    <?php
-                    $usersResult = $conn->query("SELECT user_id, firstname, lastname, email, role FROM users WHERE role IN ('client', 'paralegal')");
-                    while ($userRow = $usersResult->fetch_assoc()) {
-                        echo '<option value="' . $userRow["user_id"] . '">'
-                            . h($userRow["firstname"] . ' ' . $userRow["lastname"] . ' | ' . $userRow["email"] . ' | ' . $userRow["role"])
-                            . '</option>';
-                    }
-                    ?>
-                  </select>
-                </div>
-
-                <input type="hidden" name="document_id" value="<?php echo $row['document_id']; ?>">
-
-                <button type="submit" class="btn btn-primary form-control">Give access</button>
-              </form>
-      </div>
-    </div>
-  </div>
-</div>
-            <div class="modal fade" id="deleteDocumentForm<?= $row['document_id'] ?>" 
-     data-edit-modal="<?php echo $show_edit_modal ? 'true' : 'false'; ?>" 
-     tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Are you sure you want to delete this document?</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form action="delete_document.php" method="POST">
-        <input type="hidden" name="document_id" value="<?php echo $row['document_id']; ?>">
-
-                <div class="d-flex gap-2">
-        <button type="submit" class="btn btn-primary flex-fill">Delete document</button>
-        <a href="cases.php" class="btn btn-secondary flex-fill">Keep document</a></div>
-    </form>
-      </div>
-    </div>
-  </div>
-</div> </div>
-          
-      <?php $count++;?>
-    <?php endwhile; ?>
-  <?php else: ?>
-    <p>No documents found.</p>
-  <?php endif; ?>
-  </div>
-</div>
-<hr>
-<h1>Your Documents</h1>
-
-	<?php
-	$sql = "SELECT * FROM documents ORDER BY document_id DESC";
-	$result = $conn->query($sql);
-	?>
-
-<?php if ($result && $result->num_rows > 0): ?>
-    <?php while ($row = $result->fetch_assoc()): ?>
-        <div class="meeting">
-            <span>Name: <?php echo h($row["name"]); ?></span><br>
-            <span>Description: <?php echo h($row["description"]); ?></span><br>
-            <span>
-                File:
-                <a href="files/<?php echo rawurlencode($row["path"]); ?>" target="_blank">
-                    View
-                </a>
-            </span><br>
-
-            <?php if ($_SESSION["role"] === "admin"): ?>
-                <hr>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#grant<?php echo $row['document_id']; ?>">
-                        Grant Access
-                    </button>
-
-                    <button class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#remove<?php echo $row['document_id']; ?>">
-                        Remove Access
-                    </button>
-                </div>
-            <?php endif; ?>
-        </div>
-
-        <!-- GRANT MODAL -->
         <div class="modal fade" id="grant<?php echo $row['document_id']; ?>">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -427,7 +349,6 @@ $search = $_GET["search"] ?? "";
             </div>
         </div>
 
-        <!-- REMOVE MODAL -->
         <div class="modal fade" id="remove<?php echo $row['document_id']; ?>">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -441,7 +362,16 @@ $search = $_GET["search"] ?? "";
                         <form action="remove_document_user.php" method="POST">
                             <input type="hidden" name="document_id" value="<?php echo $row['document_id']; ?>">
 
-                            <input type="number" name="user_id" class="form-control mb-2" placeholder="User ID">
+                           <select name="user_id" class="form-control mb-2" required>
+                                <?php
+                                $users = $conn->query("SELECT * FROM document_users du join users u on du.user_id = u.user_id WHERE document_id = " . $row['document_id']);
+                                while ($u = $users->fetch_assoc()) {
+                                    echo "<option value='{$u["user_id"]}'>" .
+                                        h($u["firstname"] . " " . $u["lastname"]) .
+                                        "</option>";
+                                }
+                                ?>
+                            </select>
 
                             <button class="btn btn-danger w-100">Remove</button>
                         </form>
@@ -449,10 +379,16 @@ $search = $_GET["search"] ?? "";
 
                 </div>
             </div>
-        </div>
-
+        </div></div>
+          
+      <?php $count++;?>
     <?php endwhile; ?>
-<?php else: ?>
+  <?php else: ?>
     <p>No documents found.</p>
-<?php endif; ?>	
+  <?php endif; ?>
+  </div>
+</div>
+
+  <?php
+include "footer.php"; ?>
 </body>

@@ -47,6 +47,7 @@ session_start();
     <button class="btn btn-dark form-control mb-3">Login</button>
     <hr>
     <p>No account? <a href="signup.php">Click here to sign up.</a></p>
+    <p><a href="index.php">Click here to return to home page.</a></p>
   </form>
 </div>
 <br><br><br>

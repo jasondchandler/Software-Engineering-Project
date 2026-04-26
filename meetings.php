@@ -271,9 +271,12 @@ elseif ($_SESSION["role"] === "client") {
 
                   <?php endforeach; ?>
                 </select>
-                <button type="submit" class = "btn btn-primary form-control">Remove Selected Unavailable Time</button>
+                <br>
+                <button type="submit" class = "btn btn-primary form-control mt-5">Remove Selected Unavailable Time</button>
 
               </form>
+
+              <?php else: echo "No unavailable times are set.";?>
 
             <?php endif; ?>
 
@@ -290,5 +293,6 @@ elseif ($_SESSION["role"] === "client") {
 
 	<?php include "meeting_feed.php"?>
 
-
+  <?php
+include "footer.php"; ?>
 </body>

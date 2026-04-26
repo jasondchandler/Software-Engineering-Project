@@ -136,6 +136,7 @@ if (allow("edit-task")) {
       </div>
     <?php endif; ?>
                     
+    <hr>
     <div class="search_container"> 
     <form class="mb-3" method="GET">
       <input class="form-control mb-3"type=text name="search" placeholder="Enter search term...">
@@ -250,15 +251,26 @@ $result = $stmt->get_result();
     <?php if ($result && $result->num_rows > 0): ?>
       <?php $count = 1; while ($row = $result->fetch_assoc()): ?>
         <div class="meeting">
-            <span class="<?php if ($_SESSION["role"] != "admin") echo "name";?>">Task #<?php echo $count; ?></span><br>
-            <?php if ($_SESSION["role"] === "admin"): ?>
-                <span class="name"><?php echo h($row["firstname"] . " " . $row["lastname"] . " | " . $row["email"]); ?></span><br>
+          <div class="task-header"> 
+            <strong>Task #<?php echo $count; ?></strong>
+            <span class="status status-<?php echo strtolower($row["status"]); ?>">
+            <?php echo htmlspecialchars($row["status"]); ?>
+            </span> 
+
+          </div>
+          <?php if ($_SESSION["role"] === "admin"): ?>
+                <span class="">Assigned to: <?php echo h($row["firstname"] . " " . $row["lastname"] . " | " . $row["email"]); ?></span><br>
             <?php endif; ?>
             <span>Description: <?php echo h($row["description"]); ?></span><br>
-            <span>Due: <?php echo h($row["due"]); ?></span><br>
-            <span>Status: <?php echo h($row["status"]); ?></span><br>
-            <span>Digital Completion: <?php echo $row["can_complete_digitally"] ? "Yes" : "No"; ?></span><br>
-            <span>Created: <?php echo h($row["created_at"]); ?></span><br>
+            <span>Time: 
+            <?php
+              $timezone = new DateTimeZone("America/New_York");
+            $start = new DateTime($row["created_at"], $timezone);
+            $end = new DateTime($row["due"], $timezone);
+
+            echo $start->format("M j, Y g:i A") . " → " . $end->format("M j, Y g:i A");
+            ?> </span> <br>
+            <span>Digital Completion? <?php echo $row["can_complete_digitally"] ? "Yes" : "No"; ?></span><br>
 
             <?php if (!empty($row["completed_at"])): ?>
                 <span>Completed: <?php echo h($row["completed_at"]); ?></span><br>
@@ -276,7 +288,6 @@ $result = $stmt->get_result();
                     </a>
                 </span><br>
             <?php endif; ?>
-
 
             <hr>
 
@@ -368,6 +379,13 @@ $result = $stmt->get_result();
                                 </select>
                             </div>
 
+                            <div class="mb-3 form-check">
+                  <input type="checkbox" class="form-check-input" id="digital" name="can_complete_digitally" value="1">
+                  <label class="form-check-label" for="digital">
+                    Can be completed digitally
+                  </label>
+                </div>
+
                             <button class="btn btn-primary w-100">Update</button>
                         </form>
                     </div>
@@ -418,4 +436,6 @@ $result = $stmt->get_result();
 </div>
 </div>
 </body>
+  <?php
+include "footer.php"; ?>
 </html>

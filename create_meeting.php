@@ -72,14 +72,14 @@
     }
 
 
-    $sql = "INSERT INTO MEETINGS (location, duration, notes, user_id)
+    $sql = "INSERT INTO meetings (location, duration, notes, user_id)
             VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("sisi", $location, $duration, $notes, $user_id);
     $stmt->execute();
 
     $meeting_id = $conn->insert_id;
-    $sql = "INSERT INTO MEETING_TIMES (meeting_id, start_time, end_time)
+    $sql = "INSERT INTO meeting_times (meeting_id, start_time, end_time)
             VALUES (?, ?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("iss", $meeting_id, $string_start_time, $string_end_time);

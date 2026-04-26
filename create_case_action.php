@@ -10,13 +10,13 @@ $status = $_POST["status"];
 $user_id = $_POST["user_id"];
 
 if ($user_id === "none") {
-    $sql = "INSERT INTO CASES (title, court, type, filing_date, status) 
+    $sql = "INSERT INTO cases (title, court, type, filing_date, status) 
             VALUES (?, ?, ?, ?, ?)";
 
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("sssss", $title, $court, $type, $filing_date, $status);
 } else {
-    $sql = "INSERT INTO CASES (user_id, title, court, type, filing_date, status) 
+    $sql = "INSERT INTO cases (user_id, title, court, type, filing_date, status) 
             VALUES (?, ?, ?, ?, ?, ?)";
 
     $stmt = $conn->prepare($sql);

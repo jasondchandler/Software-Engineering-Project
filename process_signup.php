@@ -22,6 +22,21 @@ if (!$password || !$password_confirm || !$firstname || !$lastname || !$email) {
 if ($password !== $password_confirm) {
     $_SESSION["signup_error"][] = "Passwords do not match.";
 }
+if (strlen($password) < 8) {
+    $_SESSION["signup_error"][] = "Password must be at least 8 characters long.";
+}
+
+if (!preg_match("/[A-Z]/", $password)) {
+    $_SESSION["signup_error"][] = "Password must contain at least one uppercase letter.";
+}
+
+if (!preg_match("/[a-z]/", $password)) {
+    $_SESSION["signup_error"][] = "Password must contain at least one lowercase letter.";
+}
+
+if (!preg_match("/[0-9]/", $password)) {
+    $_SESSION["signup_error"][] = "Password must contain at least one number.";
+}
 
 // Check if email is unique
 $stmt = $conn->prepare("select email from users where email = ?");

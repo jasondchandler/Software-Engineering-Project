@@ -362,6 +362,14 @@ iframe{
     margin-bottom: 10px;
 }
 
+.filter_row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap; 
+    align-items: center;
+    justify-content: space-between;
+}
+
 @media(max-width:800px){
     .stats{grid-template-columns:1fr;}
 }
@@ -389,7 +397,7 @@ iframe{
 }
 
 .message.left .bubble {
-  background: #D3D3D3;
+  background: #cbeaff;
   color: #000;
   border-bottom-left-radius: 4px;
 }
@@ -402,4 +410,38 @@ iframe{
 
 .bubble {
   box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.notes-box {
+  background: #f8f9fa;
+  padding: 8px;
+  border-radius: 6px;
+  margin-top: 4px;
+}
+
+.status {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.status-pending, .status-appeal, .status-confirmed { 
+  background: #fff3cd; 
+  color: #856404; 
+}
+
+.status-completed, .status-closed, .status-complete { 
+  background: #d4edda; 
+  color: #155724; 
+}
+.status-cancelled, .status-open, .status-no_show { 
+  background: #f8d7da; 
+  color: #721c24; 
 }

@@ -8,7 +8,7 @@ function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
     <head>
 
-        <title>Charles Casale - Chats</title>
+        <title>Charles Casale - Messages</title>
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -32,11 +32,11 @@ function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
         <div class="container mb-1">
                 <?php 
-    if (!empty($_SESSION["create_chat_error"])) {
+    if (!empty($_SESSION["create_error"])) {
         echo '<div class="alert alert-danger text-center mt-3" role="alert">';
-        echo h($_SESSION["create_chat_error"]);
+        echo h($_SESSION["create_error"]);
         echo '</div>';
-        unset($_SESSION["create_chat_error"]);
+        unset($_SESSION["create_error"]);
     }
 
     if (!empty($_SESSION["create_success"])) {
@@ -50,7 +50,7 @@ function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
                 <br>
   <?php if (allow('create-chat')):
         echo '<button type="button" class="btn btn-dark w-100 mb-3 mt-0" data-bs-toggle="modal" data-bs-target="#createChatForm"> 
-      Create Chat
+      Create Conversation
     </button>';
     endif;?>
 
@@ -58,11 +58,11 @@ function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Create Chat</h5>
+            <h5 class="modal-title">Create Conversation</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form action="create_chat_action.php" method="POST">
+            <form action="create_conversation_action.php" method="POST">
             
               <label class="form-label">Select a user:</label>
                   <select name="user1" class="form-control" required>
@@ -88,7 +88,7 @@ function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
                     ?>
                   </select> <br>
 
-              <button type="submit" class="btn btn-primary form-control">Create Case</button>
+              <button type="submit" class="btn btn-primary form-control">Create Conversation</button>
             </form>
           </div>
         </div>
@@ -100,19 +100,19 @@ function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
     <?php 
     
-    if ($_SESSION["role"] === "client") {
+    if ($_SESSION["role"] === "client" || $_SESSION["role"] === "paralegal") {
 $sql = "
 SELECT 
-    c.chat_id,
+    c.conversation_id,
     u.user_id,
     u.firstname,
     u.lastname,
     u.email
-FROM CHATS c
-JOIN CHAT_USERS cu ON cu.chat_id = c.chat_id
-JOIN USERS u ON cu.user_id = u.user_id
+FROM conversations c
+JOIN conversation_users cu ON cu.conversation_id = c.conversation_id
+JOIN users u ON cu.user_id = u.user_id
   WHERE cu.user_id = ?
-ORDER BY c.chat_id
+ORDER BY c.conversation_id
 ";
   $stmt = $conn->prepare($sql);
   $stmt->bind_param("i", $_SESSION["user_id"]);
@@ -122,15 +122,13 @@ ORDER BY c.chat_id
 elseif ($_SESSION["role"] === "admin") {
 $sql = "
 SELECT 
-    c.chat_id,
-    u.user_id,
-    u.firstname,
-    u.lastname,
-    u.email
-FROM CHATS c
-JOIN CHAT_USERS cu ON cu.chat_id = c.chat_id
-JOIN USERS u ON cu.user_id = u.user_id
-ORDER BY c.chat_id
+    c.conversation_id,
+    GROUP_CONCAT(CONCAT(u.firstname, ' ', u.lastname) ORDER BY u.user_id SEPARATOR ' & ') AS users
+FROM conversations c
+JOIN conversation_users cu ON cu.conversation_id = c.conversation_id
+JOIN users u ON cu.user_id = u.user_id
+GROUP BY c.conversation_id
+ORDER BY c.conversation_id;
 ";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
@@ -141,18 +139,19 @@ ORDER BY c.chat_id
     <?php $count=1; if ($result && $result->num_rows > 0): ?>
     <?php while ($row = $result->fetch_assoc()): ?>
         <div class="meeting">
-            <span>Chat #<?php echo $count; ?></span><br>
+            <span><strong>Conversation #<?php echo $count; ?></strong></span><br>
       
             <?php 
             if ($_SESSION["role"] === "admin") {
               echo '<span>Participants: ';
-              echo $row["firstname"] . ' ' . $row["lastname"] . ' | ' . $row["email"] . '<br>';
+              echo  $row["users"] . '</span><br>';
             }
             ?></span>
+          <hr>
 
-            <form action="chat_show.php" method="GET">
-    <input type="hidden" name="chat_id" value="<?= $row["chat_id"] ?>">
-    <button type="submit" class="btn btn-primary">Open Chat</button>
+            <form action="conversation_show.php" method="GET">
+    <input type="hidden" name="conversation_id" value="<?php echo $row["conversation_id"]; ?>">
+    <button type="submit" class="btn btn-primary w-100 mt-2">Open Conversation</button>
 </form>
 
              <?php 

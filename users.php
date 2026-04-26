@@ -78,7 +78,7 @@
 
       $like = "%$search%";
 
-      $sql = "SELECT * FROM USERS";
+      $sql = "SELECT * FROM users";
 
       $params = [];
       if ($search != "") {
@@ -153,4 +153,7 @@
     <?php endif; ?>
 
 </div>
+
+  <?php
+include "footer.php"; ?>
 </body>

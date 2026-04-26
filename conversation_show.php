@@ -2,18 +2,22 @@
 session_start();
 include "connect.php";
 
+
+
 $stmt = $conn->prepare("
     SELECT 
         cm.message_id, cm.message, cm.created_at, 
         u.user_id, u.firstname, u.lastname, u.email
-    FROM CHAT_MESSAGES cm
-    JOIN USERS u ON cm.sender_id = u.user_id
-    WHERE cm.chat_id = ?
+    FROM conversation_messages cm
+    JOIN conversations c on cm.conversation_id = c.conversation_id
+    JOIN users u ON cm.sender_id = u.user_id
+    WHERE cm.conversation_id = ?
     ORDER BY cm.created_at ASC
 ");
 
-$stmt->bind_param("i", $chat_id);
-$chat_id = $_GET['chat_id'];
+
+$conversation_id = $_GET['conversation_id'];
+$stmt->bind_param("i", $conversation_id);
 
 $stmt->execute();
 $result = $stmt->get_result(); ?>
@@ -27,7 +31,7 @@ function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
     <head>
 
-        <title>Charles Casale - Chats</title>
+        <title>Charles Casale - Conversation</title>
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -88,8 +92,8 @@ function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
 ?>
 
-<form action="send_message.php"method="POST">
-    <input type="hidden" name="chat_id" value="<?= $chat_id ?>">
+<form action="send_message.php" method="POST">
+    <input type="hidden" name="conversation_id" value="<?php echo $conversation_id; ?>">
 
     <label class="form-label">Type your message: </label> <br>
     <textarea name="message" class="form-control mb-3" required></textarea>

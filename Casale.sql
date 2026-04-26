@@ -1,167 +1,163 @@
-CREATE TABLE ROLES (
+CREATE TABLE roles (
     role_name VARCHAR(20) NOT NULL,
-    CONSTRAINT ROLES_FK PRIMARY KEY (role_name)
+    CONSTRAINT roles_pk PRIMARY KEY (role_name)
 );
 
 -- ROLES INSERT
-INSERT IGNORE INTO ROLES (role_name) VALUES
+INSERT IGNORE INTO roles (role_name) VALUES
 ('client'),
 ('paralegal'),
 ('admin');
 
-CREATE TABLE USERS (
+CREATE TABLE users (
     user_id INT NOT NULL AUTO_INCREMENT,
     email VARCHAR(255) NOT NULL,
-    password VARCHAR(100) NOT NULL, 
+    password VARCHAR(100) NOT NULL,
     firstname VARCHAR(30) NOT NULL,
     lastname VARCHAR(30) NOT NULL,
     phone VARCHAR(20) NULL,
     address VARCHAR(255) NULL,
     role VARCHAR(20) DEFAULT "client",
-    CONSTRAINT User_PK PRIMARY KEY (user_id),
-    CONSTRAINT Unique_Email UNIQUE (email),
-    CONSTRAINT Unique_Phone UNIQUE (phone),
-    CONSTRAINT FK_User_Role 
-        FOREIGN KEY (role) REFERENCES ROLES(role_name)
+    CONSTRAINT user_pk PRIMARY KEY (user_id),
+    CONSTRAINT unique_email UNIQUE (email),
+    CONSTRAINT unique_phone UNIQUE (phone),
+    CONSTRAINT fk_user_role
+        FOREIGN KEY (role) REFERENCES roles(role_name)
 );
 
-CREATE TABLE PERMISSIONS (
+CREATE TABLE permissions (
     permission_id INT NOT NULL AUTO_INCREMENT,
     name VARCHAR(75) NOT NULL,
-    CONSTRAINT Permission_PK PRIMARY KEY (permission_id)
+    CONSTRAINT permission_pk PRIMARY KEY (permission_id)
 );
 
 -- PERMISSION INSERTS
-INSERT INTO PERMISSIONS (name) VALUES 
-    ('view-meetings'),
-    ('change-meeting-status'),
-    ('view-users'),
-    ('view-cases'),
-    ('set-times'),
-    ('edit-task'),
-    ('delete-task'),
-    ('edit-case'),
-    ('delete-case'),
-    ('create-case'),
-    ('delete-document'),
-    ('edit-document-user'),
-    ('view-tasks'),
-    ('view-documents'),
-    ('upload-document'),
-    ('view-chats'),
-    ('create-chat'),
-    ('view-task')
-    ;
+INSERT INTO permissions (name) VALUES
+('view-meetings'),
+('change-meeting-status'),
+('view-users'),
+('view-cases'),
+('set-times'),
+('edit-task'),
+('delete-task'),
+('edit-case'),
+('delete-case'),
+('create-case'),
+('delete-document'),
+('edit-document-user'),
+('view-tasks'),
+('view-documents'),
+('upload-document'),
+('view-chats'),
+('create-chat'),
+('view-task');
 
-CREATE TABLE ROLE_PERMISSIONS (
-    permission_id INT not null,
-    role_name VARCHAR(20) not null,
-    CONSTRAINT RP_PK PRIMARY KEY (role_name, permission_id),
-    CONSTRAINT RP_ROLE_FK FOREIGN KEY (role_name) REFERENCES ROLES(role_name),
-    CONSTRAINT RP_PERMISSION_FK FOREIGN KEY (permission_id) REFERENCES PERMISSIONS(permission_id)
+CREATE TABLE role_permissions (
+    permission_id INT NOT NULL,
+    role_name VARCHAR(20) NOT NULL,
+    CONSTRAINT role_permissions_pk PRIMARY KEY (role_name, permission_id),
+    CONSTRAINT rp_role_fk FOREIGN KEY (role_name) REFERENCES roles(role_name),
+    CONSTRAINT rp_permission_fk FOREIGN KEY (permission_id) REFERENCES permissions(permission_id)
 );
 
 -- ROLE_PERMISSION INSERTS
-INSERT INTO ROLE_PERMISSIONS (role_name, permission_id)
-SELECT 'admin', permission_id FROM PERMISSIONS;
+INSERT INTO role_permissions (role_name, permission_id)
+SELECT 'admin', permission_id FROM permissions;
 
-INSERT INTO ROLE_PERMISSIONS (role_name, permission_id)
+INSERT INTO role_permissions (role_name, permission_id)
 SELECT 'paralegal', permission_id
-FROM PERMISSIONS
-WHERE name = 'view-meetings', 'view-task', 'view-chats';
+FROM permissions
+WHERE name IN ('view-meetings', 'view-tasks', 'view-chats');
 
-INSERT INTO ROLE_PERMISSIONS (role_name, permission_id)
+INSERT INTO role_permissions (role_name, permission_id)
 SELECT 'client', permission_id
-FROM PERMISSIONS
-WHERE name IN ('view-chats', 'view-meetings', 'view-cases', 'view-documents', 'view-task');
+FROM permissions
+WHERE name IN ('view-chats', 'view-meetings', 'view-cases', 'view-documents', 'view-tasks');
 
-CREATE TABLE CHATS (
-    chat_id INT NOT NULL AUTO_INCREMENT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    CONSTRAINT Chat_PK PRIMARY KEY (chat_id)
+CREATE TABLE conversations (
+    conversation_id INT NOT NULL AUTO_INCREMENT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chat_pk PRIMARY KEY (conversation_id)
 );
 
-CREATE TABLE CHAT_USERS (
-    chat_id INT NOT NULL,
+CREATE TABLE conversation_users (
+    conversation_id INT NOT NULL,
     user_id INT NOT NULL,
-    CONSTRAINT Chat_User_PK PRIMARY KEY (chat_id, user_id),
-    CONSTRAINT Chat_User_FK_User FOREIGN KEY (user_id) REFERENCES USERS(user_id),
-    CONSTRAINT Chat_User_FK_Chat FOREIGN KEY (chat_id) REFERENCES CHATS(chat_id)
+    CONSTRAINT chat_user_pk PRIMARY KEY (conversation_id, user_id),
+    CONSTRAINT chat_user_fk_user FOREIGN KEY (user_id) REFERENCES users(user_id),
+    CONSTRAINT chat_user_fk_chat FOREIGN KEY (conversation_id) REFERENCES conversations(conversation_id)
 );
 
-CREATE TABLE CHAT_MESSAGES (
+CREATE TABLE conversation_messages (
     message_id INT NOT NULL AUTO_INCREMENT,
-    chat_id INT NOT NULL,
+    conversation_id INT NOT NULL,
     sender_id INT NOT NULL,
     message TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT Chat_Message_PK PRIMARY KEY (message_id),
-    CONSTRAINT Chat_Message_FK_Sender FOREIGN KEY (sender_id) REFERENCES USERS(user_id),
-    CONSTRAINT Chat_Message_FK_Chat FOREIGN KEY (chat_id) REFERENCES CHATS(chat_id)
+    CONSTRAINT chat_message_pk PRIMARY KEY (message_id),
+    CONSTRAINT chat_message_fk_sender FOREIGN KEY (sender_id) REFERENCES users(user_id),
+    CONSTRAINT chat_message_fk_chat FOREIGN KEY (conversation_id) REFERENCES conversations(conversation_id)
 );
 
-CREATE TABLE TASKS (
+CREATE TABLE tasks (
     task_id INT NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
     description VARCHAR(250) NOT NULL,
     can_complete_digitally BOOLEAN NOT NULL DEFAULT FALSE,
     status VARCHAR(20) NOT NULL DEFAULT 'Pending',
-	completion_notes VARCHAR(250) NULL,
+    completion_notes VARCHAR(250) NULL,
     completion_file VARCHAR(200) NULL,
     completed_at TIMESTAMP NULL DEFAULT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    due TIMESTAMP NOT NULL, 
-    CONSTRAINT Task_PK PRIMARY KEY (task_id),
-    CONSTRAINT Task_User_FK FOREIGN KEY (user_id) REFERENCES USERS(user_id),
-    CONSTRAINT Task_Status_Check CHECK (
-        status IN ('Pending', 'Completed')
-    )
+    due TIMESTAMP NOT NULL,
+    CONSTRAINT task_pk PRIMARY KEY (task_id),
+    CONSTRAINT task_user_fk FOREIGN KEY (user_id) REFERENCES users(user_id),
+    CONSTRAINT task_status_check CHECK (status IN ('Pending', 'Completed'))
 );
 
-CREATE TABLE MEETINGS (
-  meeting_id int NOT NULL AUTO_INCREMENT,
-  location varchar(255) NOT NULL DEFAULT "Zoom",
-  duration int NOT NULL,           
-  notes text NULL,
-  status enum('pending','confirmed','cancelled', 'no_show', 'complete') NOT NULL DEFAULT 'pending',
-  user_id int NOT NULL,
-  created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT Meeting_PK PRIMARY KEY (meeting_id),
-  CONSTRAINT Meeting_FK FOREIGN KEY (user_id) REFERENCES Users(user_id)
+CREATE TABLE meetings (
+  meeting_id INT NOT NULL AUTO_INCREMENT,
+  location VARCHAR(255) NOT NULL DEFAULT "Zoom",
+  duration INT NOT NULL,
+  notes TEXT NULL,
+  status ENUM('pending','confirmed','cancelled','no_show','complete') NOT NULL DEFAULT 'pending',
+  user_id INT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT meeting_pk PRIMARY KEY (meeting_id),
+  CONSTRAINT meeting_fk FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
-CREATE TABLE MEETING_TIMES (
-  meeting_time_id int NOT NULL AUTO_INCREMENT,
-  meeting_id int NOT NULL,
-  start_time datetime NOT NULL,
-  end_time datetime NOT NULL,
-  CONSTRAINT Meeting_Time_PK PRIMARY KEY (meeting_time_id),
-  CONSTRAINT Meeting_Time_FK FOREIGN KEY (meeting_id) REFERENCES Meetings(meeting_id)
+CREATE TABLE meeting_times (
+  meeting_time_id INT NOT NULL AUTO_INCREMENT,
+  meeting_id INT NOT NULL,
+  start_time DATETIME NOT NULL,
+  end_time DATETIME NOT NULL,
+  CONSTRAINT meeting_time_pk PRIMARY KEY (meeting_time_id),
+  CONSTRAINT meeting_time_fk FOREIGN KEY (meeting_id) REFERENCES meetings(meeting_id)
 );
 
-CREATE TABLE CASES (
-    case_id int not null AUTO_INCREMENT,
-    user_id int null,
-    title varchar(100) not null,
-    court varchar(100) not null,
-    type varchar(30) not null,
-    filing_date DATE not null,
-    status varchar(20) not null,
-    CONSTRAINT Case_PK PRIMARY KEY (case_id),
-    CONSTRAINT Case_Status_Check CHECK 
-        (status IN ("Open", "Closed", "Pending", "Appeal"))
+CREATE TABLE cases (
+    case_id INT NOT NULL AUTO_INCREMENT,
+    user_id INT NULL,
+    title VARCHAR(100) NOT NULL,
+    court VARCHAR(100) NOT NULL,
+    type VARCHAR(30) NOT NULL,
+    filing_date DATE NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    CONSTRAINT case_pk PRIMARY KEY (case_id),
+    CONSTRAINT case_status_check CHECK (status IN ('Open', 'Closed', 'Pending', 'Appeal'))
 );
 
-CREATE TABLE UNAVAILABLE_TIMES (
+CREATE TABLE unavailable_times (
     times_id INT AUTO_INCREMENT,
     date DATE NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
     repeat_daily BOOLEAN DEFAULT FALSE,
-    CONSTRAINT Times_PK Primary Key (times_id)
+    CONSTRAINT times_pk PRIMARY KEY (times_id)
 );
- 
+
 CREATE TABLE case_fee (
     fee_id INT AUTO_INCREMENT PRIMARY KEY,
     case_id INT NOT NULL,
@@ -177,49 +173,48 @@ CREATE TABLE case_hours (
     case_id INT NOT NULL,
     work_date DATE NOT NULL,
     hours DECIMAL(4,2) NOT NULL,
-    description varchar(250) not null,
+    description VARCHAR(250) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT CH_Case_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
+    CONSTRAINT ch_case_fk FOREIGN KEY (case_id) REFERENCES cases(case_id)
 );
 
-CREATE TABLE CASE_RETAINERS (
-    case_id int not null,
-	value int not null,
-    CONSTRAINT CR_PK PRIMARY KEY (case_id),
-    CONSTRAINT CR_User_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
+CREATE TABLE case_retainers (
+    case_id INT NOT NULL,
+    value INT NOT NULL,
+    CONSTRAINT case_retainers_pk PRIMARY KEY (case_id),
+    CONSTRAINT cr_case_fk FOREIGN KEY (case_id) REFERENCES cases(case_id)
 );
 
-CREATE TABLE DOCUMENTS (
-    document_id int not null AUTO_INCREMENT,
-	case_id int null,
-	name varchar(200) not null,
-	description varchar(250) null,
-	path varchar(200) not null, 
-    CONSTRAINT D_PK PRIMARY KEY (document_id),
-    CONSTRAINT D_Case_FK FOREIGN KEY (case_id) REFERENCES Cases(case_id)
+CREATE TABLE documents (
+    document_id INT NOT NULL AUTO_INCREMENT,
+    case_id INT NULL,
+    name VARCHAR(200) NOT NULL,
+    description VARCHAR(250) NULL,
+    path VARCHAR(200) NOT NULL,
+    CONSTRAINT documents_pk PRIMARY KEY (document_id),
+    CONSTRAINT d_case_fk FOREIGN KEY (case_id) REFERENCES cases(case_id)
 );
 
-CREATE TABLE DOCUMENT_USERS (
+CREATE TABLE document_users (
     document_id INT NOT NULL,
     user_id INT NOT NULL,
-    CONSTRAINT Document_Users_PK PRIMARY KEY (document_id, user_id),
-    CONSTRAINT Document_Users_Document_FK FOREIGN KEY (document_id) REFERENCES DOCUMENTS(document_id),
-    CONSTRAINT Document_Users_User_FK FOREIGN KEY (user_id) REFERENCES USERS(user_id)
+    CONSTRAINT document_users_pk PRIMARY KEY (document_id, user_id),
+    CONSTRAINT du_document_fk FOREIGN KEY (document_id) REFERENCES documents(document_id),
+    CONSTRAINT du_user_fk FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
-CREATE TABLE Cases_users (
-    case_id int not null,
-    user_id int not null,
-    CONSTRAINT CU_PK PRIMARY KEY (case_id, user_id),
-    CONSTRAINT CU_FK_CASE FOREIGN KEY (case_id) REFERENCES Cases(case_id),
-    CONSTRAINT CU_FK_USER FOREIGN KEY (user_id) REFERENCES Users(user_id)
+CREATE TABLE cases_users (
+    case_id INT NOT NULL,
+    user_id INT NOT NULL,
+    CONSTRAINT cases_users_pk PRIMARY KEY (case_id, user_id),
+    CONSTRAINT cu_case_fk FOREIGN KEY (case_id) REFERENCES cases(case_id),
+    CONSTRAINT cu_user_fk FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
-
 
 /**************
 Run this to give an account admin role
 change the where clause as needed
 **************/
-UPDATE USERS
+UPDATE users
 SET role = 'admin'
-WHERE user_id = 1;  
+WHERE user_id = 1;

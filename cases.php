@@ -60,19 +60,19 @@ $show_edit_modal = !empty($_SESSION["edit_case_error"]);
     </div>
 
     <div class="stats mb-3">
-        <div class="stat text-center">
+        <div class="stat">
             <div class="small">Open Cases</div>
             <div class="num fs-4"><?php echo $ongoingCount; ?></div>
             <div class="small">In progress</div>
         </div>    
     
-        <div class="stat text-center">
+        <div class="stat">
             <div class="small">Pending Cases</div>
             <div class="num fs-4"><?php echo $pendingCount; ?></div>
             <div class="small">Awaiting review</div>
         </div>
 
-        <div class="stat text-center">
+        <div class="stat">
             <div class="small">Closed Cases</div>
             <div class="num fs-4"><?php echo $closedCount; ?></div>
             <div class="small">Completed</div>
@@ -195,7 +195,6 @@ $show_edit_modal = !empty($_SESSION["edit_case_error"]);
         ?>
 
         <hr>
-        <br>
         <h1>Your cases:</h1>
 
         <div class="search_container">
@@ -203,14 +202,13 @@ $show_edit_modal = !empty($_SESSION["edit_case_error"]);
                 <?php if (!empty($_GET['search'])): ?>
                     <input type="hidden" name="search" value="<?php echo h($_GET['search']); ?>">
                 <?php endif; ?>
-
-                <label>
+                    <div class = "filter_row"> <label>
                     <input type="checkbox" name="status" value="1" <?php if(!empty($_GET['status'])) echo 'checked'; ?>> Status
                 </label>
                 <label>
                     <input type="checkbox" name="type" value="1" <?php if(!empty($_GET['type'])) echo 'checked'; ?>> Type
                 </label>
-                <button type="submit" class="btn btn-primary w-100 mt-2">Sort cases</button>
+                <button type="submit" class="btn btn-primary w-100 mt-2">Sort cases</button></div>
             </form>
         </div>
     </div>
@@ -283,7 +281,11 @@ $show_edit_modal = !empty($_SESSION["edit_case_error"]);
             $feeStmt->close();
 
             echo "<div class='meeting'>";
-            echo "<span class='name'>Title: ".h($row['title'])."</span><br>";
+            echo "<div class='task-header'>";
+            echo "<span class='name'>Title: ".h($row['title'])."</span>";
+            echo "<span class='status status-" . strtolower($row["status"]) . "'>" .
+            htmlspecialchars($row["status"]) .
+            "</span></div>";
             echo "<span>User: ".($row['firstname'] ? h($row['firstname']." ".$row['lastname']) : "Unassigned")."</span><br>";
             echo "<span>Court: ".h($row['court'])."</span><br>";
             echo "<span>Type: ".h($row['type'])."</span><br>";
@@ -416,5 +418,7 @@ $show_edit_modal = !empty($_SESSION["edit_case_error"]);
     $conn->close();
     ?>
 </div>
+  <?php
+include "footer.php"; ?>
 </body>
 </html>
